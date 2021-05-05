@@ -5,4 +5,8 @@ module.exports = {
     page: true,
     REACT_APP_ENV: true,
   },
+  rules: {
+    'no-underscore-dangle': 0,
+    'no-nested-ternary': 0,
+  },
 };

@@ -1,69 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { PageContainer } from '@ant-design/pro-layout';
-import { StatisticCard } from '@ant-design/pro-card';
+import { Space } from 'antd';
+import IntroduceRow from '@/pages/dashboard/components/IntroduceRow';
+import ServiceRow from '@/pages/dashboard/components/ServiceRow';
+import MaterialPicker from '@/components/MaterialPicker';
 
-const Dashboard = props => {
+
+const Dashboard = () => {
+
+
   return (
-    <PageContainer>
-      <StatisticCard.Group>
-        <StatisticCard
-          statistic={{
-            title: '支付金额',
-            value: 2176,
-            icon: (
-              <img
-                style={imgStyle}
-                src='https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*dr_0RKvVzVwAAAAAAAAAAABkARQnAQ'
-                alt='icon'
-              />
-            ),
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: '访客数',
-            value: 475,
-            icon: (
-              <img
-                style={imgStyle}
-                src='https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*-jVKQJgA1UgAAAAAAAAAAABkARQnAQ'
-                alt='icon'
-              />
-            ),
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: '支付成功订单数',
-            value: 87,
-            icon: (
-              <img
-                style={imgStyle}
-                src='https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*FPlYQoTNlBEAAAAAAAAAAABkARQnAQ'
-                alt='icon'
-              />
-            ),
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: '浏览量',
-            value: 1754,
-            icon: (
-              <img
-                style={imgStyle}
-                src='https://gw.alipayobjects.com/mdn/rms_7bc6d8/afts/img/A*pUkAQpefcx8AAAAAAAAAAABkARQnAQ'
-                alt='icon'
-              />
-            ),
-          }}
-        />
-      </StatisticCard.Group>
-    </PageContainer>
+    <Space style={{ width: '100%' }} direction={'vertical'} size={'large'}>
+      <IntroduceRow />
+      <ServiceRow />
+      <MaterialPicker/>
+    </Space>
   );
 };
 
-Dashboard.propTypes = {};
 
 export default Dashboard;

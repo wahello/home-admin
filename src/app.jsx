@@ -1,13 +1,19 @@
 import { PageLoading } from '@ant-design/pro-layout';
-import { message, notification } from 'antd';
+import { Image, message, notification } from 'antd';
 import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import LoginApi from '@/services/login';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+
+moment.locale('zh-cn');
+
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -50,12 +56,10 @@ export async function getInitialState() {
 // https://umijs.org/zh-CN/plugins/plugin-layout
 export const layout = ({ initialState }) => {
   return {
+    locale: false,
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
-    waterMarkProps: {
-      content: initialState?.currentUser?.name,
-    },
-    footerRender: () => <Footer />,
+    footerRender: false,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
@@ -63,22 +67,11 @@ export const layout = ({ initialState }) => {
         history.push(loginPath);
       }
     },
-    links: isDev
-      ? [
-        <Link to='/umi/plugin/openapi' target='_blank'>
-          <LinkOutlined />
-          <span>openAPI 文档</span>
-        </Link>,
-        <Link to='/~docs'>
-          <BookOutlined />
-          <span>业务组件文档</span>
-        </Link>,
-      ]
-      : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
+    logo: <img src={'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'} />,
   };
 };
 
@@ -101,13 +94,31 @@ const codeMessage = {
   504: '网关超时。',
 };
 
+const errorCodeMessage = {
+  10001: '账户已禁用',
+  10101: '用户不存在',
+  10102: '密码错误',
+  10103: '密码错误次数过多',
+  30204: '登录已过期',
+  40201: '用户不存在',
+  40202: '旧密码错误',
+  60101: '此手机号已被绑定',
+  60201: '此邮箱已被绑定',
+  60301: '获取微信信息失败',
+  60302: '此账号已被绑定',
+  60401: '获取支付宝信息失败',
+  60402: '此账号已被绑定',
+  90001: '获取数据异常',
+  [-1]: '数据不存在',
+};
+
 /** 异常处理程序
  * @see https://beta-pro.ant.design/docs/request-cn
  */
 const errorHandler = (error) => {
   const { name, response } = error;
   if (name === 'BizError') {
-    message.error(error.info.errorMessage);
+    message.error(errorCodeMessage[error.info.errorCode]||error.info.errorMessage);
   } else {
     if (response && response.status) {
       const errorText = codeMessage[response.status] || response.statusText;
@@ -132,6 +143,16 @@ const errorHandler = (error) => {
 export const request = {
   errorHandler,
   requestInterceptors: [(url, options) => {
+    if (url.startsWith('http')) {
+      return {
+        url, options: {
+          ...options,
+          headers: {
+            ...options.headers,
+          },
+        },
+      };
+    }
     return {
       url: 'https://6330733a-7e48-4972-9c93-39caf08ddb2a.bspapp.com/http/api',
       options: {
@@ -140,7 +161,7 @@ export const request = {
         data: {
           '$url': url,
           uni_id_token: localStorage.getItem('uni_id_token'),
-          data: { ...options.data },
+          data: options.data,
         },
       },
     };
@@ -149,6 +170,7 @@ export const request = {
     adaptor: (resData) => {
       return {
         success: resData.code === 0,
+        errorCode: resData.code,
         errorMessage: resData.msg,
       };
     },

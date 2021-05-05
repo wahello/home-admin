@@ -1,0 +1,52 @@
+.mobile {
+  width: 375px;
+  height: 667px;
+  position: relative;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .header {
+    display: block;
+    width: 100%;
+    height: 64px;
+    top: 0;
+    margin: 0 auto;
+    line-height: 82px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: pointer;
+    pointer-events: none;
+    span {
+      display: block;
+      height: 100%;
+      padding: 0 15px;
+      line-height: 87px;
+      text-align: center;
+    }
+  }
+
+  .body {
+    position: absolute;
+    width: 100%;
+    height: 667px;
+    top: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-repeat: no-repeat;
+    background-size: cover;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .headerPlaceHolder {
+      width: 100%;
+      height: 64px;
+      background: transparent;
+    }
+  }
+}

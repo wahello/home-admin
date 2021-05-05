@@ -8,6 +8,7 @@ import RoleApi from '@/services/system/role';
 import UserForm from '@/pages/system/user/components/UserForm';
 
 const UserList = () => {
+
   const [formVisible, setFormVisible] = useState(false);
   const [dataId, setDataId] = useState();
 
@@ -19,7 +20,7 @@ const UserList = () => {
     }
   }, [formVisible]);
 
-  const editRecord = id => {
+  const editRecord =async id => {
     setDataId(id);
     setFormVisible(true);
   };
@@ -36,15 +37,16 @@ const UserList = () => {
     }
   };
 
-  const columns = [{
-    title: '用户名',
-    dataIndex: 'username',
-  },
+  const columns = [
+    {
+      title: '用户名',
+      dataIndex: 'username',
+    },
     {
       title: '角色',
       dataIndex: 'roles',
-      render: roles => {
-        return roles.map(it => it.role_name).join('|');
+      render: text => {
+        return text.map(it => it.role_name).join('|');
       },
       request: async () => {
         const { data } = await RoleApi.list();
@@ -71,7 +73,7 @@ const UserList = () => {
       render: (_, { _id }) => (<Space>
         <Button size={'small'} type={'primary'} onClick={() => editRecord(_id)}>修改</Button>
         <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(_id)}>
-          <Button size={'small'} danger>删除</Button>
+          <Button type={'primary'} size={'small'} danger>删除</Button>
         </Popconfirm>
       </Space>),
     }];

@@ -15,7 +15,6 @@ export default defineConfig({
     ...defaultSettings,
   },
   // https://umijs.org/zh-CN/plugins/plugin-locale
-  locale: false,
   dynamicImport: {
     loading: '@ant-design/pro-layout/es/PageLoading',
   },
@@ -36,6 +35,15 @@ export default defineConfig({
   manifest: {
     basePath: '/',
   },
+  publicPath: '/manage/',
   // Fast Refresh 热更新
   fastRefresh: {},
+  nodeModulesTransform: {
+    type: 'none',
+    exclude: [],
+  },
+  extraBabelPlugins: [['import', {
+    libraryName: '@ant-design/charts',
+    libraryDirectory: 'lib',
+  }]],
 });

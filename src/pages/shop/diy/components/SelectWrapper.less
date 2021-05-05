@@ -1,0 +1,25 @@
+@import '~antd/es/style/themes/default.less';
+
+.wrapper {
+  position: relative;
+  padding: 0 10px;
+  border: 1px dashed transparent;
+  cursor: move;
+  *:not(.delete){
+    cursor: move;
+  }
+}
+
+.delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  background: #000000 ;
+  color: #FFFFFF;
+  opacity: .8;
+}
+
+.checked {
+  border-color: @primary-color;
+}

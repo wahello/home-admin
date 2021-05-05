@@ -1,16 +1,16 @@
 export default {
   "navTheme": "light",
-  "primaryColor": "#1890ff",
-  "layout": "side",
+  "primaryColor": "#00B26A",
+  "layout": "mix",
   "contentWidth": "Fluid",
-  "fixedHeader": true,
+  "fixedHeader": false,
   "fixSiderbar": true,
   "title": "管理平台",
-  "pwa": false,
+  "pwa": true,
   "iconfontUrl": "",
   "menu": {
-    "locale": true
+    "locale": false
   },
   "headerHeight": 48,
-  "splitMenus": false
+  "splitMenus": true
 };

@@ -1,0 +1,41 @@
+.list {
+  :global {
+    .ant-row {
+      height: 370px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+}
+
+.uploadBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+  background: #fafafa;
+  border: 1px dashed #d9d9d9;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.previewImage{
+  position: relative;
+  border-radius: 2px;
+
+}
+.mask {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: inherit;
+  height: inherit;
+  color: #fff;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, .5);
+}

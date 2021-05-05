@@ -63,9 +63,6 @@ const Login = () => {
 
         <div className={styles.main}>
           <ProForm
-            initialValues={{
-              autoLogin: true,
-            }}
             submitter={{
               searchConfig: {
                 submitText: '登录',
