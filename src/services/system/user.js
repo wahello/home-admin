@@ -31,5 +31,6 @@ const UserApi = {
       data
     });
   },
+
 };
 export default UserApi;

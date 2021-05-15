@@ -2,8 +2,6 @@
 
 .wrapper {
   position: relative;
-  padding: 0 10px;
-  border: 1px dashed transparent;
   cursor: move;
   *:not(.delete){
     cursor: move;
@@ -18,8 +16,38 @@
   background: #000000 ;
   color: #FFFFFF;
   opacity: .8;
+  zoom: 2;
 }
 
-.checked {
-  border-color: @primary-color;
+.mask{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px solid @primary-color;
+  .toolTip{
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: @primary-color;
+    color: #FFFFFF;
+    font-size: 40px;
+    width: 60px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 #2D8CF0;
+  }
 }
+.dropPlaceHolder {
+  width: 100%;
+  margin: 10px 0;
+  background: #D9EBFF;
+  font-size: 20px;
+  height: 100px;
+  line-height: 50px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

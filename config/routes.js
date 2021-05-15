@@ -56,23 +56,13 @@
     path: '/order',
     name: '订单管理',
     icon: 'project',
-    routes: [
-      {
-        path: '/order/list',
-        name: '订单列表',
-        component: './order/list',
-        icon: 'project',
-      },
-      {
-        path: '/order/detail',
-        name: '订单详情',
-        component: './order/detail',
-        hideInMenu: true,
-      },
-      {
-        redirect: '/order/list',
-      },
-    ],
+    component: './order/list',
+  },
+  {
+    path: '/order/detail',
+    name: '订单详情',
+    component: './order/detail',
+    hideInMenu: true,
   },
   {
     path: '/shop',
@@ -157,6 +147,35 @@
     ],
   },
   {
+    name: '会员管理',
+    path: '/member',
+    icon: 'user',
+    routes: [
+      {
+        path: '/member',
+        redirect: '/member/dashboard',
+      },
+      {
+        path: '/member/dashboard',
+        name: '会员概况',
+        icon: 'pie-chart',
+        component: './member/dashboard',
+      },
+      {
+        path: '/member/manage',
+        name: '会员管理',
+        icon: 'team',
+        component: './member/manage',
+      },
+      {
+        path: '/member/detail',
+        name: '会员详情',
+        hideInMenu: true,
+        component: './member/detail',
+      },
+    ],
+  },
+  {
     path: '/promotion',
     name: '营销管理',
     icon: 'gift',
@@ -186,6 +205,122 @@
             path: '/promotion/coupon/edit',
             name: '修改优惠券',
             component: './promotion/coupon/form',
+            hideInMenu: true,
+          },
+        ],
+      },
+      {
+        path: '/promotion/group',
+        name: '拼团活动',
+        icon: 'icon-group',
+        routes: [
+          {
+            path: '/promotion/group',
+            redirect: '/promotion/group/list',
+          },
+          {
+            path: '/promotion/group/list',
+            component: './promotion/group/list',
+            hideInMenu: true,
+            name: '拼团活动',
+          },
+          {
+            path: '/promotion/group/add',
+            name: '新增拼团',
+            component: './promotion/group/form',
+            hideInMenu: true,
+          },
+          {
+            path: '/promotion/group/edit',
+            name: '修改拼团',
+            component: './promotion/group/form',
+            hideInMenu: true,
+          },
+        ],
+      },
+      {
+        path: '/promotion/recharge',
+        name: '充值礼包',
+        icon: 'icon-recharge',
+        routes: [
+          {
+            path: '/promotion/recharge',
+            redirect: '/promotion/recharge/list',
+          },
+          {
+            path: '/promotion/recharge/list',
+            component: './promotion/recharge/list',
+            hideInMenu: true,
+            name: '充值礼包',
+          },
+          {
+            path: '/promotion/recharge/add',
+            name: '新增充值项',
+            component: './promotion/recharge/form',
+            hideInMenu: true,
+          },
+          {
+            path: '/promotion/recharge/edit',
+            name: '修改充值项',
+            component: './promotion/recharge/form',
+            hideInMenu: true,
+          },
+        ],
+      },
+      {
+        path: '/promotion/reward',
+        name: '消费奖励',
+        icon: 'icon-consume-gift',
+        routes: [
+          {
+            path: '/promotion/reward',
+            redirect: '/promotion/luck-draw/list',
+          },
+          {
+            path: '/promotion/luck-draw/list',
+            component: './promotion/recharge/list',
+            hideInMenu: true,
+            name: '充值送礼',
+          },
+          {
+            path: '/promotion/recharge/add',
+            name: '新增充值项',
+            component: './promotion/recharge/form',
+            hideInMenu: true,
+          },
+          {
+            path: '/promotion/recharge/edit',
+            name: '修改充值项',
+            component: './promotion/recharge/form',
+            hideInMenu: true,
+          },
+        ],
+      },
+      {
+        path: '/promotion/luck-draw',
+        name: '积分抽奖',
+        icon: 'icon-game',
+        routes: [
+          {
+            path: '/promotion/luck-draw',
+            redirect: '/promotion/luck-draw/list',
+          },
+          {
+            path: '/promotion/luck-draw/list',
+            component: './promotion/recharge/list',
+            hideInMenu: true,
+            name: '充值送礼',
+          },
+          {
+            path: '/promotion/recharge/add',
+            name: '新增充值项',
+            component: './promotion/recharge/form',
+            hideInMenu: true,
+          },
+          {
+            path: '/promotion/recharge/edit',
+            name: '修改充值项',
+            component: './promotion/recharge/form',
             hideInMenu: true,
           },
         ],

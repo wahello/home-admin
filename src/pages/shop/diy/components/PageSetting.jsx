@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import ProForm, { ProFormDependency, ProFormRadio, ProFormText } from '@ant-design/pro-form';
 import ColorPicker from '@/components/ColorPicker';
 import MaterialPicker from '@/components/MaterialPicker';
@@ -35,16 +34,16 @@ const PageSetting = props => {
         }
       </ProFormDependency>
 
-      <ProForm.Item name='bgColor' label={'背景颜色'}>
+      <ProForm.Item name='bgColor' label={'页面背景颜色'}>
         <ColorPicker />
       </ProForm.Item>
-      <ProForm.Item name='bgPic' label={'背景图片'}>
+
+      <ProForm.Item name='bgPic' label={'页面背景图片'}>
         <MaterialPicker />
       </ProForm.Item>
     </>
   );
 };
 
-PageSetting.propTypes = {};
 
 export default PageSetting;

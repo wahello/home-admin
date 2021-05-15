@@ -1,7 +1,6 @@
 import moment from 'moment';
 import Crypto from 'crypto-js';
 import request from 'umi-request';
-import { message } from 'antd';
 
 
 const sign = (e) => {

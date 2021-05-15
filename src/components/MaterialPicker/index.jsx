@@ -45,7 +45,14 @@ const MaterialPicker = props => {
 
 
   useEffect(() => {
-    setCheckItems(props.value || []);
+    if (props.value) {
+      if (typeof props.value === 'string') {
+        setCheckItems([props.value]);
+      }else{
+        setCheckItems(props.value)
+      }
+    }
+    setCheckItems([]);
   }, [props.value]);
 
   const categoryTabs = useMemo(() => {
@@ -99,7 +106,7 @@ const MaterialPicker = props => {
       await MaterialApi.add({
         file_url: fileUrl,
         name: file.name,
-        category:currentKey==='all'?null:currentKey
+        category: currentKey === 'all' ? null : currentKey,
       });
       onSuccess(fileUrl);
       listRef.current.reset();
@@ -112,9 +119,14 @@ const MaterialPicker = props => {
   };
 
   const removeImage = idx => {
-    const newImages = [...props.value];
-    newImages.splice(idx, 1);
-    props.onChange(newImages);
+
+    if (typeof props.value ==='string') {
+      props.onChange(null)
+    }else{
+      const newImages = [...props.value];
+      newImages.splice(idx, 1);
+      props.onChange(newImages);
+    }
   };
 
   const renderContent = useMemo(() => {
@@ -122,18 +134,24 @@ const MaterialPicker = props => {
       return props.customRender({ onClick: toggleVisible.setTrue });
     }
     if (props.mode === 'single') {
-      return props.value?.length ?
-        <PreviewImage size={props.size} src={props.value[0]} onRemove={() => props.onChange([])} /> :
+      return props.value ?
+        <PreviewImage size={props.size} src={props.value} onRemove={removeImage} /> :
         <UploadBtn size={props.size} onClick={toggleVisible.setTrue} />;
     }
     return <Space>
-      {props.value?.map((it, idx) => <PreviewImage key={it} size={props.size} src={it} onRemove={() => removeImage(idx)} />)}
+      {props.value?.map((it, idx) => <PreviewImage key={it} size={props.size} src={it}
+                                                   onRemove={() => removeImage(idx)} />)}
       {(props.value?.length || 0) < props.maxCount && <UploadBtn size={props.size} onClick={toggleVisible.setTrue} />}
     </Space>;
   }, [props.mode, props.value, props.maxCount]);
 
   const confirm = () => {
-    props.onChange(checkItems);
+    if (props.mode === 'single') {
+      props.onChange(checkItems?.[0]);
+    } else {
+      props.onChange(checkItems);
+    }
+
     toggleVisible.setFalse();
   };
   return (
@@ -179,7 +197,7 @@ const MaterialPicker = props => {
 
 MaterialPicker.propTypes = {
   mode: PropTypes.oneOf(['single', 'multi']),
-  value: PropTypes.array,
+  value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   onChange: PropTypes.func,
   maxCount: PropTypes.number,
   customRender: PropTypes.func,

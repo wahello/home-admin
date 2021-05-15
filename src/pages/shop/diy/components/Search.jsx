@@ -1,20 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './component.less';
+import styles from './Search.less';
 import { SearchOutlined } from '@ant-design/icons';
 
 
 const Search = ({ settings }) => {
 
-  const borderRadius = settings.shape === 'square' ? 5 : 50;
+  const { shape, bgColor, textColor, inputBgColor, ...extraStyle } = settings;
+  const borderRadius = shape === 'square' ? 5 : 50;
   return (
-    <div className={styles.wrapper} style={{ backgroundColor: settings.bgColor, color: settings.textColor }}>
-      <div className={styles.search}>
+    <div className={styles.wrapper}
+         style={{ backgroundColor: settings.bgColor, color: settings.textColor, ...extraStyle }}>
+      <div className={styles.search} style={{
+        borderRadius,
+        backgroundColor: settings.inputBgColor,
+      }}>
         <SearchOutlined className={styles.icon} />
-        <input  style={{
-          borderRadius,
-          backgroundColor: settings.inputBgColor,
-        }} value={settings.placeholder} readOnly />
+        <input value={settings.placeholder} readOnly />
       </div>
     </div>
   );

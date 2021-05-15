@@ -48,7 +48,7 @@ const skuColumns = [
     title: '起售数量',
     dataIndex: 'min_num',
     valueType: 'digit',
-    fieldProps: { precision: 0,min:1 },
+    fieldProps: { precision: 0, min: 1 },
     width: '10%',
   },
   {
@@ -73,7 +73,7 @@ const ServiceForm = props => {
 
   const addSku = () => {
     skuRef.current?.addEditRecord?.({
-      id: uuid().replaceAll("-",""),
+      id: uuid().replaceAll('-', ''),
       min_num: 1,
     }, { newRecordType: 'dataSource' });
   };
@@ -83,13 +83,14 @@ const ServiceForm = props => {
       getRequest.run({ id });
     } else {
       const sku = {
-        id: uuid().replaceAll("-",""),
+        id: uuid().replaceAll('-', ''),
+        min_num: 1,
       };
       baseForm.setFieldsValue({
         pay: {
           type: Enums.payType.BEFORE.value,
         },
-        skus:[sku]
+        skus: [sku],
       });
       setEditableRowKeys([sku.id]);
     }
@@ -97,15 +98,9 @@ const ServiceForm = props => {
   useEffect(() => {
     const service = getRequest.data;
     if (service) {
-      const skus = service.skus.filter(sku => !sku.default).map(sku => {
-        return {
-          ...sku,
-          pic: sku.pic ? [sku.pic] : [],
-        };
-      });
+      const skus = service.skus.filter(sku => !sku.default);
       const formData = {
         ...service,
-        main_pic: [service.main_pic],
         skus,
       };
       baseForm.setFieldsValue(formData);
@@ -128,13 +123,7 @@ const ServiceForm = props => {
     try {
       const submitValues = {
         ...values,
-        main_pic: values.main_pic[0],
-        skus: values.skus?.map(sku => {
-          return {
-            ...sku,
-            pic: sku.pic?.[0],
-          };
-        }),
+        main_pic: values.main_pic,
       };
       if (id) {
         await ServiceApi.update({ ...submitValues, id });
@@ -175,19 +164,34 @@ const ServiceForm = props => {
             >
               <ProFormText
                 name='name'
-                width={'md'}
+                width={'lg'}
                 label='服务名称'
                 placeholder='请输入名称'
                 rules={[{ required: true }]}
               />
+              {/*<ProFormText*/}
+              {/*  name='sub_title'*/}
+              {/*  width={'lg'}*/}
+              {/*  label='描述信息'*/}
+              {/*  placeholder='副标题，展示在名称下方'*/}
+              {/*/>*/}
+              <ProFormSelect
+                name='keywords'
+                width={'lg'}
+                label='关键字'
+                mode={'tags'}
+                fieldProps={{open:false}}
+                placeholder=''
+                extra={'用于搜索引擎优化，可输入多个，回车分隔。例如北京上门保洁、北京冰箱清洗等'}
+              />
               <ProFormSelect name='category' label='服务分类' width='md' placeholder='请选择分类' rules={[{ required: true }]}
                              request={async () => {
                                const { data: categoryList } = await ServiceCategoryApi.list();
-                               return categoryList?.map(({ _id, name,children }) => ({
+                               return categoryList?.map(({ _id, name, children }) => ({
                                  value: _id,
                                  label: name,
-                                 children:children.map(it=>({value:it._id, label: it.name})),
-                                 optionType:'optGroup'
+                                 children: children.map(it => ({ value: it._id, label: it.name })),
+                                 optionType: 'optGroup',
                                }));
                              }}
               />
@@ -200,6 +204,8 @@ const ServiceForm = props => {
                                        }));
                                      }}
               />
+              <ProFormDigit name={'virtual_sales'} label={'虚拟销量'} min={0} initialValue={0}
+                            fieldProps={{ precision: 0 }} />
               <ProForm.Item
                 label='服务规格'
                 required
@@ -215,7 +221,7 @@ const ServiceForm = props => {
                       newRecordType: 'dataSource',
                       creatorButtonText: '添加规格',
                       record: () => ({
-                        id: uuid().replaceAll("-",""),
+                        id: uuid().replaceAll('-', ''),
                         min_num: 1,
                       }),
                     }}

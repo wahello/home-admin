@@ -1,0 +1,60 @@
+.cube_one-one {
+  width: 750px;
+  .cubeImg {
+    width: 100%;
+  }
+}
+.cube_one-two {
+  display: flex;
+  width: 750px;
+  .cubeImg {
+    width: 50%;
+  }
+}
+.cube_one-three {
+  display: flex;
+  width: 750px;
+  .cubeImg {
+    width: 100%/3;
+  }
+}
+.cube_two-three {
+  position: relative;
+  width: 750px;
+  height: 375px;
+  .cubeImg {
+    flex-shrink: 0;
+    width: 50%;
+    height: 375px;
+    &:not(:first-of-type) {
+      width:50%;
+      height: 188px;
+      position: absolute;
+    }
+    &:nth-of-type(2) {
+      top: 0;
+    }
+    &:nth-of-type(3) {
+      bottom: 0;
+    }
+  }
+}
+.cube_one-four {
+  display: flex;
+  width: 750px;
+  .cubeImg {
+    width: 25%;
+  }
+}
+.cube_two-four {
+  display: flex;
+  flex-wrap: wrap;
+  width: 750px;
+  .cubeImg {
+    width: 50%;
+    height: 188px;
+  }
+}
+.cubeImg {
+  object-fit: cover;
+}

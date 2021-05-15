@@ -1,5 +1,5 @@
 import MyIcon from '@/components/MyIcon';
-import { MoneyCollectOutlined } from '@ant-design/icons';
+import { WalletOutlined } from '@ant-design/icons';
 
 const Enums = {
   discountType: {
@@ -69,6 +69,10 @@ const Enums = {
       text: '服务中',
       value: 'SERVICING',
     },
+    SERVICE_FINISHED: {
+      text: '待确认完成',
+      value: 'SERVICE_FINISHED',
+    },
     WAIT_PAY_AFTER: {
       text: '待支付尾款',
       value: 'WAIT_PAY_AFTER',
@@ -82,11 +86,11 @@ const Enums = {
       value: 'FINISHED',
     },
     CLOSING: {
-      text: '申请关闭中',
+      text: '申请取消中',
       value: 'CLOSING',
     },
     CLOSED: {
-      text: '已关闭',
+      text: '已取消',
       value: 'CLOSED',
     },
   },
@@ -98,6 +102,10 @@ const Enums = {
     PAID: {
       text: '已付款',
       value: 'PAID',
+    },
+    CANCELED: {
+      text: '已取消',
+      value: 'CANCELED',
     },
   },
   platform: {
@@ -121,10 +129,90 @@ const Enums = {
       value: 'mp-toutiao',
       icon: <MyIcon type={'douyin'} size={20} color={'#070103'} />,
     },
-    'offline': {
+  },
+  payChannel: {
+    wxpay: {
+      text: '微信支付',
+      value: 'wxpay',
+      icon: <MyIcon type={'weixin'} size={20} color={'#09BB07'} />,
+    },
+    alipay: {
+      text: '支付宝支付',
+      value: 'alipay',
+      icon: <MyIcon type={'zhifubao'} size={20} color={'#06B4FD'} />,
+    },
+    balance: {
+      text: '余额支付',
+      value: 'balance',
+      icon: <WalletOutlined style={{fontSize:20,color:'#ff9900'}}   />,
+    },
+    offline: {
       text: '线下支付',
       value: 'offline',
-      icon:  <MyIcon type={'offline'} size={20} color={'#9266F9'} />,
+      icon: <MyIcon type={'offline'} size={20} color={'#9266F9'} />,
+    },
+  },
+  orderType: {
+    NORMAL: {
+      text: '普通订单',
+      value: 'NORMAL',
+      color: '#87d068',
+    },
+    GROUP: {
+      text: '拼团',
+      value: 'GROUP',
+      color: '#F50',
+    },
+  },
+  groupRecordState: {
+    PROCESSING: {
+      text: '拼团中',
+      value: 'PROCESSING',
+      color: '#ff9900',
+    },
+    FAILED: {
+      text: '拼团失败',
+      value: 'FAILED',
+      color: '#fa3534',
+    },
+    SUCCESS: {
+      text: '拼团成功',
+      value: 'SUCCESS',
+      color: '#51bc81',
+    },
+  },
+  refundMethod: {
+    ORIGINAL: {
+      text: '原路退回',
+      value: 'ORIGINAL',
+    },
+    TRANSFORM: {
+      text: '手动转账',
+      value: 'TRANSFORM',
+    },
+  },
+  refundType: {
+    AUTO: {
+      text: '自动退款',
+      value: 'AUTO',
+    },
+    MANUAL: {
+      text: '手动退款',
+      value: 'MANUAL',
+    },
+  },
+  refundState: {
+    REFUNDING: {
+      text: '退款中',
+      value: 'REFUNDING',
+    },
+    SUCCESS: {
+      text: '退款成功',
+      value: 'SUCCESS',
+    },
+    FAILED: {
+      text: '退款失败',
+      value: 'FAILED',
     },
   },
 };

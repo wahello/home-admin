@@ -31,8 +31,8 @@ const OrderApi = {
   changeState: async (data) => {
     return request('admin/order/sys/changeState', { data });
   },
-  copy: async (data) => {
-    return request('admin/order/sys/copy', { data });
+  cancel: async (data) => {
+    return request('admin/order/sys/cancel', { data });
   },
 };
 export default OrderApi;

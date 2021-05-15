@@ -1,24 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './component.less';
-import { Carousel, Image } from 'antd';
+import { Carousel } from 'antd';
+import errorImg from '@/assets/error-image.png';
 
 
 const Swiper = ({ settings }) => {
 
-  const imgStyle={
-    borderRadius: settings.shape === 'square' ? 0 : 10,
+  const { shape, pics, ...extraStyle } = settings;
+  const imgStyle = {
+    borderRadius: shape === 'square' ? 0 : 20,
     width: '100%',
-    height:175
-  }
+    height: 350,
+    objectFit:'cover'
+  };
+  console.log(pics);
   return (
-    <div className={styles.wrapper}>
+    <div style={{ ...extraStyle }}>
       <Carousel>
         {
-          settings.pics.length?settings.pics.map((it,idx) => {
-            return <div key={idx.toString()}><img  draggable={false} style={imgStyle} src={it.pic}    /></div>;
-          }):<div><span>选择您的图片</span></div>
-        }
+          pics.length ? pics.map((it, idx) => {
+            return <div key={idx.toString()}><img draggable={false} style={imgStyle} src={it.pic||errorImg} /></div>;
+          }) : <div><img draggable={false} src={errorImg} style={imgStyle} />
+          </div>}
       </Carousel>
     </div>
   );

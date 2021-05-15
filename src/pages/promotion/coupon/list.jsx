@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Button, message, Popconfirm, Space } from 'antd';
+import { Button, message, Popconfirm, Space, Switch } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
@@ -28,11 +28,6 @@ const CouponList = () => {
 
   const columns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-    },
-    {
       title: '优惠券名称',
       dataIndex: 'name',
     },
@@ -51,7 +46,7 @@ const CouponList = () => {
       hideInSearch: true,
     },
     {
-      title: '最低使用金额',
+      title: '使用门槛',
       dataIndex: ['discount', 'use_min'],
       valueType: 'money',
       hideInSearch: true,
@@ -78,9 +73,9 @@ const CouponList = () => {
     {
       title: '是否公开',
       dataIndex: 'is_public',
-      valueType: 'switch',
-      fieldProps:{
-        width:'unset'
+      render: it => <Switch checked={it} />,
+      renderFormItem: (_, { fieldProps  }) => {
+        return <Switch style={{width:'unset'}} {...fieldProps} />;
       }
     },
     {

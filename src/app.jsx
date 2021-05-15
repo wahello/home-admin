@@ -1,5 +1,5 @@
 import { PageLoading } from '@ant-design/pro-layout';
-import { Image, message, notification } from 'antd';
+import { ConfigProvider, Image, message, notification } from 'antd';
 import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
@@ -57,7 +57,7 @@ export async function getInitialState() {
 export const layout = ({ initialState }) => {
   return {
     locale: false,
-    rightContentRender: () => <RightContent />,
+    rightContentRender: () => <ConfigProvider componentSize={'small'}><RightContent /></ConfigProvider>,
     disableContentMargin: false,
     footerRender: false,
     onPageChange: () => {

@@ -3,15 +3,17 @@ import PropTypes from 'prop-types';
 import styles from './SelectWrapper.less';
 import classNames from 'classnames';
 import { useDebounceFn, useHover } from 'ahooks';
-import { Tag } from 'antd';
 import { useDrag, useDrop } from 'react-dnd';
 import DiyContext from '@/pages/shop/diy/DiyContext';
+import { DeleteOutlined } from '@ant-design/icons';
+import components from '@/pages/shop/diy/components';
 
+const DropPlaceHolder = <div className={styles.dropPlaceHolder}>放这里</div>;
 const SelectWrapper = props => {
   const ref = useRef();
   const isHovering = useHover(ref);
 
-  const { items, setItems, currentItem, setCurrentItem } = useContext(DiyContext);
+  const { currentItem, setCurrentItem,mpSetting,setMpSetting } = useContext(DiyContext);
   const { run } = useDebounceFn(
     (item, monitor) => {
       if (!ref.current) {
@@ -82,12 +84,13 @@ const SelectWrapper = props => {
 
   drag(drop(ref));
 
-  const onRemove = () => {
-    const idx = items.findIndex(it => it.id === props.item.id);
-    const newItems = [...items];
-    newItems.splice(idx, 1);
-    setItems(newItems);
-    if (currentItem?.id === props.item.id) {
+  const onRemove = (e) => {
+    e.stopPropagation();
+    const newMpSetting = {...mpSetting}
+    const idx = mpSetting.components.findIndex(it => it.id === props.item.id);
+    newMpSetting.components.splice(idx, 1);
+    setMpSetting(newMpSetting);
+    if (currentItem?.key === props.item.key) {
       setCurrentItem(null);
     }
   };
@@ -96,13 +99,27 @@ const SelectWrapper = props => {
     return props.item.id === currentItem?.id;
   }, [currentItem?.id, props.item.id]);
 
-  const onCheck = () => setCurrentItem(props.item);
+  const onCheck = () => {
+    setCurrentItem(props.item);
+  };
+  const findComponent = useMemo(() => {
+    if (props.item.id === -1) {
+      return DropPlaceHolder;
+    }
+    return React.cloneElement(components.find(it => it.key === props.item.key).component, { settings: props.item.settings });
+
+  }, [props.item.id, props.item.key, props.item.settings]);
+
   return (
     <div ref={ref} onClick={onCheck}
-         className={classNames(styles.wrapper, (isHovering || checked) && styles.checked)}
+         className={classNames(styles.wrapper)}
          style={{ opacity: isDragging ? 0 : 1 }}>
-      {React.cloneElement(props.item.component, { settings: props.item.settings })}
-      {(isHovering || checked) && <Tag className={styles.delete} onClick={onRemove}>删除</Tag>}
+      {findComponent}
+      {(isHovering || checked) && <div className={styles.mask}>
+        <div className={styles.toolTip}>
+          <DeleteOutlined onClick={onRemove} />
+        </div>
+      </div>}
     </div>
   );
 };

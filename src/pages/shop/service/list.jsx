@@ -153,14 +153,14 @@ const ServiceList = props => {
     },
     {
       title: '销量',
-      dataIndex: 'sales_volume',
+      dataIndex: 'virtual_sales',
       hideInSearch: true,
-      render: ({ real = 0, virtual = 0 }) => {
+      render: (virtual_sales,{ real_sales = 0  }) => {
         return <Tooltip title={<Space direction={'vertical'}>
-          <span>真实销量：{real}</span>
-          <span>虚拟销量：{virtual}</span>
+          <span>真实销量：{real_sales}</span>
+          <span>虚拟销量：{virtual_sales}</span>
         </Space>}>
-          <span>{real + virtual}</span>
+          <span>{real_sales + virtual_sales}</span>
         </Tooltip>;
       },
     },

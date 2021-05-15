@@ -13,7 +13,7 @@ const MaterialImage = props => {
   return (
     <ProCard>
       <div className={styles.wrapper} onClick={checkImage}>
-        <Image width={130} height={130} className={classNames(styles.img, props.checked && styles.selected)}
+        <Image width={120} height={120} className={classNames(styles.img, props.checked && styles.selected)}
                src={props.fileUrl} fallback={errorImage}
                preview={false} />
         <Checkbox className={styles.checkbox} checked={props.checked} onChange={checkImage} />
@@ -26,6 +26,7 @@ MaterialImage.propTypes = {
   fileUrl: PropTypes.string,
   checked: PropTypes.bool,
   onChange: PropTypes.func,
+  size: PropTypes.number,
 };
 
 export default MaterialImage;

@@ -1,24 +1,19 @@
-import React, { useEffect } from 'react';
-import { Form } from 'antd';
+import React from 'react';
 import ProForm from '@ant-design/pro-form';
 import PropTypes from 'prop-types';
-
+import FormContext from '@/pages/shop/diy/components/FormContext';
 
 
 const SettingForm = props => {
-    const [form] = Form.useForm();
 
-    useEffect(() => {
-      form.setFieldsValue(props.settings);
-    }, [props.settings]);
 
-    return <ProForm submitter={false} form={form} style={{ width: '100%' }} layout={'horizontal'}
-                    onFieldsChange={props.changeSetting}>
+  return <FormContext.Provider value={form}>
+    <ProForm submitter={false} form={form} style={{ width: '100%' }} layout={'horizontal'}
+             onFieldsChange={props.changeSetting}>
       {props.children}
-    </ProForm>;
-
-  }
-;
+    </ProForm>
+  </FormContext.Provider>
+};
 
 SettingForm.propTypes = {
   settings: PropTypes.object,

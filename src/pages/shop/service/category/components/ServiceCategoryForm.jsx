@@ -24,7 +24,7 @@ const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId 
     if (data) {
       form.setFieldsValue({
         ...data,
-        pic: [data.pic],
+        pic: data.pic,
       });
     }else{
       form.resetFields()
@@ -42,12 +42,11 @@ const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId 
     if (id) {
       const updateData = {
         ...values,
-        pic:values.pic?.[0],
         id,
       };
       await ServiceCategoryApi.update(updateData);
     } else {
-      await ServiceCategoryApi.add({ ...values, pic: values.pic?.[0] });
+      await ServiceCategoryApi.add(values);
     }
     return onFinish();
   };

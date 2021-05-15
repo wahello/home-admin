@@ -1,36 +1,22 @@
 import React, { useRef, useState } from 'react';
-import { Button, Image, message, Popconfirm, Space } from 'antd';
+import { Button, message, Popconfirm, Space, Tag } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import OrderApi from '@/services/order/order';
 import Enums from '@/utils/enums';
-import styles from './index.less';
+import ServiceItem from '@/components/ServiceItem';
 
 
 const stateTabs = [
   {
-    label: '全部',
+    tab: '全部',
     key: 'all',
   },
-  ...Object.values(Enums.orderState).map(({ text, value }) => ({ label: text, key: value })),
+  ...Object.values(Enums.orderState).map(({ text, value }) => ({ tab: text, key: value })),
 ];
 
-
-const Service = ({ service: { name, sku } }) => <div className={styles.service}>
-  <Image width={60} height={60} src={sku.pic} />
-  <div className={styles.info}>
-    <div>
-      <b>{name}</b>
-      <b style={{ color: '#fa3534' }}>￥{sku.price}</b>
-    </div>
-    <div>
-      <span>{sku.name}</span>
-      <span>{sku.num}{sku.unit}</span>
-    </div>
-  </div>
-</div>;
 
 const OrderList = props => {
 
@@ -105,25 +91,30 @@ const OrderList = props => {
   };
 
 
-
   const columns = [
     {
       title: '订单号',
       dataIndex: 'order_no',
       width: 220,
+      render: (v, { type,platform }) => <Space size={'small'} direction={'vertical'}>
+        <span>{v}</span>
+        <Space size={'small'}>
+          {type!==Enums.orderType.NORMAL.value&&<Tag color={Enums.orderType[type]?.color}>{Enums.orderType[type]?.text}</Tag>}
+          {Enums.platform[platform].icon}
+        </Space>
+      </Space>,
       copyable: true,
     },
     {
       title: '服务信息',
-      dataIndex: 'service',
-      width: 300,
-      render: (it) => <Service service={it} />,
-      hideInSearch: true,
+      dataIndex: ['service','name'],
+      width: 350,
+      render: (_,{service}) => <ServiceItem service={service} />,
     },
     {
       title: '地址',
       dataIndex: 'address',
-      width: 300,
+      width: 350,
       render: (it) => <div>
         <Space size={'small'} direction={'vertical'}>
           <Space>
@@ -136,18 +127,40 @@ const OrderList = props => {
       hideInSearch: true,
     },
     {
-      title: '预约时间',
+      title: '上门时间',
       dataIndex: 'appoint_time',
       width: 150,
+      valueType: 'date',
+      render:v=>v
+    },
+    {
+      title: '支付模式',
+      dataIndex: ['service', 'pay', 'type'],
+      valueEnum: Enums.payType,
+      width: 100,
+    },
+    {
+      title: '实付金额',
+      dataIndex: 'actual_fee',
+      width: 120,
+      valueType: 'money',
+      hideInSearch:true
+    },
+    {
+      title: '已支付金额',
+      dataIndex: 'paid_fee',
+      width: 120,
+      valueType: 'money',
+      hideInSearch:true
     },
     {
       title: '状态',
       dataIndex: 'state',
       valueEnum: Enums.orderState,
       hideInSearch: true,
+      width: 150,
       align: 'center',
     },
-
     {
       title: '下单时间',
       dataIndex: '_add_time_str',

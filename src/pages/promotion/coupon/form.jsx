@@ -3,11 +3,11 @@ import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProForm, {
   ProFormDatePicker,
-  ProFormDateRangePicker,
   ProFormDependency,
   ProFormDigit,
   ProFormRadio,
-  ProFormSelect, ProFormSwitch,
+  ProFormSelect,
+  ProFormSwitch,
   ProFormText,
 } from '@ant-design/pro-form';
 import { Button, Form, message, Result, Spin } from 'antd';
@@ -17,7 +17,7 @@ import Enums from '@/utils/enums';
 import ServiceCategoryApi from '@/services/shop/service-category';
 import { history } from '@@/core/history';
 import moment from 'moment';
-import ServicePicker from '@/components/ServicePicker';
+import LimitServiceFormItem from '@/pages/promotion/coupon/components/LimitServiceFormItem';
 
 
 const CouponForm = props => {
@@ -156,7 +156,7 @@ const CouponForm = props => {
               />
               <span> 张</span>
             </ProForm.Item>
-            <ProFormSwitch name="is_public" label="是否公开" extra={'公开可以在领券中心和可用商品页看见'} />
+            <ProFormSwitch name='is_public' label='是否公开' extra={'公开可以在领券中心和可用商品页看见'} />
             <ProFormRadio.Group
               name={['expire', 'type']}
               initialValue={Enums.expireType.DATE.value}
@@ -182,17 +182,17 @@ const CouponForm = props => {
             <ProFormSelect mode={'multiple'} name='limit_categories' label='限定可用分类' width='md' placeholder='请选择'
                            request={async () => {
                              const { data: categoryList } = await ServiceCategoryApi.list();
-                             return categoryList?.map(({ _id, name,children }) => ({
+                             return categoryList?.map(({ _id, name, children }) => ({
                                value: _id,
                                label: name,
-                               children:children.map(it=>({value:it._id, label: it.name})),
-                               optionType:'optGroup'
+                               children: children.map(it => ({ value: it._id, label: it.name })),
+                               optionType: 'optGroup',
                              }));
                            }}
                            extra={'为空则所有分类都可用'}
             />
             <ProForm.Item label={'限定可用商品'} name={'limit_services'} extra={'为空则所有服务都可用'}>
-              <ServicePicker />
+              <LimitServiceFormItem />
             </ProForm.Item>
           </ProForm>}
       </ProCard>

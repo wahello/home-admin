@@ -8,7 +8,10 @@ const CouponApi = {
     return request('admin/promotion/coupon/sys/update', { data });
   },
   page: async (data) => {
-    return request('admin/promotion/coupon/sys/page',{data});
+    return request('admin/promotion/coupon/sys/page', { data });
+  },
+  list: async () => {
+    return request('admin/promotion/coupon/sys/list');
   },
   get: async (data) => {
     return request('admin/promotion/coupon/sys/get', { data });

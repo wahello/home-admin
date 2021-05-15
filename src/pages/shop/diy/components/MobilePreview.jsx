@@ -1,14 +1,13 @@
 import React, { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import styles from './MobilePreview.less';
 import headerImg from '@/assets/mobile_header.png';
 import { useDrop } from 'react-dnd';
 import SelectWrapper from '@/pages/shop/diy/components/SelectWrapper';
 import DiyContext from '@/pages/shop/diy/DiyContext';
 
-const MobilePreview = ({ pageSettings }) => {
+const MobilePreview = () => {
 
-  const { items, setItems, currentItem, setCurrentItem } = useContext(DiyContext);
+  const { mpSetting, setMpSetting } = useContext(DiyContext);
 
   const [, drop] = useDrop({
     accept: 'SOURCE',
@@ -16,25 +15,24 @@ const MobilePreview = ({ pageSettings }) => {
   });
 
   const moveItem = useCallback((dragIndex, hoverIndex) => {
-    console.log(dragIndex, hoverIndex);
+    const newMpSetting = { ...mpSetting };
     if (dragIndex === undefined) {
-      const lessIndex = items.findIndex((it) => it.id === -1);
-      const newItems = [...items];
-      const [placeholderItem] = newItems.splice(lessIndex, 1);
-      newItems.splice(hoverIndex, 0, placeholderItem);
-      setItems(newItems);
+      const lessIndex = newMpSetting.components.findIndex((it) => it.id === -1);
+      const [placeholderItem] = newMpSetting.components.splice(lessIndex, 1);
+      newMpSetting.components.splice(hoverIndex, 0, placeholderItem);
+      setMpSetting(newMpSetting);
     } else {
-      const dragItem = items[dragIndex];
-      const newItems = [...items];
-      console.log(newItems.map(it=>it.name));
-      newItems.splice(dragIndex, 1);
-      console.log(newItems.map(it=>it.name));
-      newItems.splice(hoverIndex, 0, dragItem);
-      console.log(newItems.map(it=>it.name));
-      setItems(newItems);
+      const dragItem = newMpSetting.components[dragIndex];
+      newMpSetting.components.splice(dragIndex, 1);
+      newMpSetting.components.splice(hoverIndex, 0, dragItem);
     }
-  }, [setItems, items]);
+    setMpSetting(newMpSetting);
+  }, [mpSetting, setMpSetting]);
 
+
+  const pageSettings = useMemo(() => {
+    return mpSetting.page;
+  }, [mpSetting]);
 
   const isDefaultStyle = useMemo(() => {
     return pageSettings.navStyle === 'default';
@@ -54,30 +52,36 @@ const MobilePreview = ({ pageSettings }) => {
     return style;
   }, [isDefaultStyle, pageSettings.navBgColor, pageSettings.titleColor]);
   const bodyStyle = useMemo(() => {
-    return { marginTop: isDefaultStyle ? 63 : 0 };
-  }, [isDefaultStyle]);
+    return {
+      marginTop: isDefaultStyle ? 126 : 0,
+      padding: `0 ${pageSettings.padding}px`,
+      height: isDefaultStyle ? 1206 : 1334,
+    };
+  }, [isDefaultStyle, pageSettings.padding]);
 
   const bgStyle = useMemo(() => {
     const style = {
-      minHeight: '100%',
+      height: '100%',
       backgroundSize: '100%',
       backgroundRepeat: 'no-repeat',
     };
-    if (pageSettings.bgPic.length) {
-      style.backgroundImage = `url(${pageSettings.bgPic[0]})`;
+    if (pageSettings.bgPic) {
+      style.backgroundImage = `url(${pageSettings.bgPic})`;
+      style.backgroundColor = '#F8F8F8';
     } else {
       style.backgroundColor = pageSettings.bgColor;
     }
     return style;
   }, [pageSettings.bgColor, pageSettings.bgPic]);
+
   return (
-    <div ref={drop} role={'Dustbin'} className={styles.mobile}>
+    <div ref={drop} className={styles.mobile}>
       <div className={styles.header} style={headerStyle}>
         <span>{pageSettings.title}</span>
       </div>
       <div className={styles.body} style={bodyStyle}>
         <div style={bgStyle}>
-          {items.map((it, i) => {
+          {mpSetting.components.map((it, i) => {
             return <SelectWrapper moveItem={moveItem} item={it} index={i} key={it.id} />;
           })}
         </div>
@@ -86,8 +90,5 @@ const MobilePreview = ({ pageSettings }) => {
   );
 };
 
-MobilePreview.propTypes = {
-  pageSettings: PropTypes.object,
-};
 
 export default MobilePreview;

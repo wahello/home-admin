@@ -37,22 +37,12 @@ const ServiceTagList = props => {
 
   const columns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-    },
-    {
       title: '标签名称',
       dataIndex: 'name',
     },
     {
       title: '标签描述',
       dataIndex: 'desc',
-    },
-    {
-      title: '标签颜色',
-      dataIndex: 'color',
-      valueType: 'color',
     },
     {
       title: '创建时间',
