@@ -132,6 +132,7 @@ const GroupForm = props => {
       'services': services.concat(addService),
     });
     setEditableRowKeys([...editableKeys, ...keys]);
+    toggleServiceVisible.setFalse()
   };
   const onFinish = async values => {
     try {

@@ -19,6 +19,11 @@ const MemberApi = {
       data
     });
   },
+  pageAccount: async (data) => {
+    return request('admin/member/sys/pageAccount', {
+      data
+    });
+  },
   pageAddress: async (data) => {
     return request('admin/member/sys/pageAddress', {
       data
@@ -34,5 +39,10 @@ const MemberApi = {
       data
     });
   },
+  adjustAccount: async (data) => {
+    return request('admin/member/sys/adjustAccount', {
+      data
+    });
+  }
 };
 export default MemberApi;

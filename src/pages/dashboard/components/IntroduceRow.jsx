@@ -55,7 +55,7 @@ const IntroduceRow = () => {
   const { data, loading, run, error } = useRequest(StatisticApi.todayData);
   const orderFormatData = useMemo(() => {
     if (data) {
-      const { weekOrderData, totalOrderData } = data;
+      const { weekOrderData, totalOrderData={} } = data;
       const orderData = weeks.map(date => {
         const value = weekOrderData.find(it => it.date === date);
         return {
@@ -68,6 +68,7 @@ const IntroduceRow = () => {
     }
     return null;
   }, [data]);
+
 
   const orderNumData = useMemo(() => {
     if (orderFormatData) {
@@ -89,6 +90,7 @@ const IntroduceRow = () => {
     }
     return null;
   }, [orderFormatData]);
+
   const saleTotalData = useMemo(() => {
     if (orderFormatData) {
       const { weekOrderData, totalOrderData } = orderFormatData;
@@ -110,16 +112,75 @@ const IntroduceRow = () => {
     return null;
   }, [orderFormatData]);
 
+
+  const userNumData = useMemo(() => {
+    if (data) {
+      const { weekRegisterData, totalRegisterCount } = data;
+      const weekFormatData = weeks.map(date => {
+        const value = weekRegisterData.find(it => it.date === date);
+        return {
+          date,
+          value: value?.count || 0,
+        };
+      });
+      const todayData = weekFormatData[7];
+      const yesterdayData = weekFormatData[6];
+      const lastWeekDayData = weekFormatData[0];
+      const today = todayData.value;
+      const yesterday = yesterdayData.value;
+      const lastWeekDay = lastWeekDayData.value;
+      return {
+        today,
+        yesterday,
+        dayCompare: yesterday > 0 ? ((today - yesterday) / yesterday) : (today > 0 ? 1 : 0),
+        weekCompare: lastWeekDay > 0 ? ((today - lastWeekDay) / lastWeekDay) : (today > 0 ? 1 : 0),
+        total: totalRegisterCount,
+        list: weekFormatData,
+      };
+    }
+    return null;
+  }, [data]);
+
+  const visitsData = useMemo(() => {
+    if (data) {
+      const { weekVisitData, totalVisitCount } = data;
+      const weekFormatData = weeks.map(date => {
+        const value = weekVisitData.find(it => it.date === date);
+        return {
+          date,
+          value: value?.count || 0,
+        };
+      });
+      const todayData = weekFormatData[7];
+      const yesterdayData = weekFormatData[6];
+      const lastWeekDayData = weekFormatData[0];
+      const today = todayData.value;
+      const yesterday = yesterdayData.value;
+      const lastWeekDay = lastWeekDayData.value;
+      return {
+        today,
+        yesterday,
+        dayCompare: yesterday > 0 ? ((today - yesterday) / yesterday) : (today > 0 ? 1 : 0),
+        weekCompare: lastWeekDay > 0 ? ((today - lastWeekDay) / lastWeekDay) : (today > 0 ? 1 : 0),
+        total: totalVisitCount,
+        list: weekFormatData,
+      };
+    }
+    return null;
+  }, [data]);
+
+
+
   const allData = useMemo(() => {
     return {
       order: orderNumData,
       sale: saleTotalData,
-      user: orderNumData,
-      visit: orderNumData,
+      user: userNumData,
+      visit: visitsData,
     };
-  }, [orderNumData, saleTotalData]);
+  }, [orderNumData, saleTotalData, userNumData, visitsData]);
 
-  console.log(orderNumData);
+
   return error ? <ProCard>
     <Empty
       image={errorSvg}
@@ -164,7 +225,7 @@ const IntroduceRow = () => {
                        label: null,
                        line: null,
                      }} yAxis={{
-                alias: '订单数',
+                alias: field.label,
                 range: [0, 1],
                 grid: null,
                 label: null,

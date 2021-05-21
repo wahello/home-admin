@@ -43,8 +43,8 @@ export default defineConfig({
     type: 'none',
     exclude: [],
   },
-  extraBabelPlugins: [['import', {
-    libraryName: '@ant-design/charts',
-    libraryDirectory: 'lib',
-  }]],
+  // extraBabelPlugins: [['import', {
+  //   libraryName: '@ant-design/charts',
+  //   libraryDirectory: 'lib',
+  // }]],
 });

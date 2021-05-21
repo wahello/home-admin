@@ -130,8 +130,7 @@ const OrderList = props => {
       title: '上门时间',
       dataIndex: 'appoint_time',
       width: 150,
-      valueType: 'date',
-      render:v=>v
+      valueType: 'dateTime',
     },
     {
       title: '支付模式',

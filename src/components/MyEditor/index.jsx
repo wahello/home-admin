@@ -5,6 +5,7 @@ import { PictureOutlined } from '@ant-design/icons';
 import BraftEditor from 'braft-editor';
 import 'braft-editor/dist/index.css';
 import { ContentUtils } from 'braft-utils';
+import { useControllableValue } from 'ahooks';
 
 const editorProps = {
   style: { border: '1px solid #d1d1d1' },
@@ -21,23 +22,17 @@ const editorProps = {
 };
 const MyEditor = props => {
 
-  const [editorState, setEditorState] = useState(null);
+  const [editorState, setEditorState] = useControllableValue(props, { defaultValue: [] });
 
-  useEffect(() => {
-    setEditorState(BraftEditor.createEditorState(props.value));
-  }, [props.value]);
+  const insertPic = pics => {
+    setEditorState(ContentUtils.insertMedias(editorState, pics.map(url => ({
+      type: 'IMAGE',
+      url,
+    }))));
+  };
 
-  const insertPic = useMemo(() => {
-    return pics => {
-      const newValue = ContentUtils.insertMedias(editorState, pics.map(url => ({
-        type: 'IMAGE',
-        url,
-      })));
-      props.onChange(newValue.toHTML());
-    };
-  }, [editorState]);
   const onBlur = e => {
-    props.onChange(e.toHTML());
+    setEditorState(e);
   };
 
   return <BraftEditor {...editorProps} value={editorState} onBlur={onBlur}
@@ -46,7 +41,7 @@ const MyEditor = props => {
                         type: 'button',
                         text: <MaterialPicker customRender={customProps => <PictureOutlined {...customProps} />}
                                               mode={'multi'} maxCount={100}
-                                              onChange={insertPic} />,
+                                              onChange={insertPic} destroyOnClose/>,
                       }]}
   />;
 };

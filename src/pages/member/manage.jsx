@@ -28,7 +28,6 @@ const MemberManage = () => {
     {
       dataIndex: 'platform',
       title: '注册平台',
-      valueEnum: Enums.platform,
       render: it => {
         const platform = Enums.platform[it];
         return platform ? <Space size={'small'}>

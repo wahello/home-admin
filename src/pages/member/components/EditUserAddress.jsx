@@ -15,7 +15,7 @@ const EditUserAddress = ({ address, visible, onVisibleChange, onFinish }) => {
     }
   }, [address]);
   const onSubmit = async (values) => {
-    await MemberApi.updateUserAddress({ addressId: address._id, address: values });
+    await MemberApi.updateUserAddress({ addressId: address._id,userId:address.userId, address: values });
     return onFinish();
   };
   return (

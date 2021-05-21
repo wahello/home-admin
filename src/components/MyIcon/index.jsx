@@ -2,7 +2,7 @@ import { createFromIconfontCN } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
 const Icon = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/font_2526926_nmoqetcenah.js',
+  scriptUrl: '//at.alicdn.com/t/font_2526926_f888cijbfo5.js',
 });
 
 const MyIcon = props => {

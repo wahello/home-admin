@@ -12,7 +12,7 @@ import { history, useRequest } from 'umi';
 import ProCard from '@ant-design/pro-card';
 import ServiceCategoryApi from '@/services/shop/service-category';
 import ServiceTagApi from '@/services/shop/service-tag';
-import { Button, Form, message, Result, Spin, Tag } from 'antd';
+import { Button, Form, Input, message, Result, Select, Spin, Tag } from 'antd';
 import Enums from '@/utils/enums';
 import MaterialPicker from '@/components/MaterialPicker';
 import { EditableProTable } from '@ant-design/pro-table';
@@ -124,6 +124,7 @@ const ServiceForm = props => {
       const submitValues = {
         ...values,
         main_pic: values.main_pic,
+        service_content: values.service_content.toHTML(),
       };
       if (id) {
         await ServiceApi.update({ ...submitValues, id });
@@ -146,21 +147,21 @@ const ServiceForm = props => {
           {getRequest.error ?
             <Result status={500} title={'加载错误'} subTitle={'网络异常，请重试'}
                     extra={<Button type={'primary'} onClick={() => getRequest.run({ id })}>重试</Button>} /> :
-            <ProForm form={baseForm} layout={'horizontal'} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}
-                     onFinish={submitService}
-                     validateMessages={{
-                       required: '此项为必填项',
-                     }}
-                     submitter={{
-                       searchConfig: {
-                         submitText: '保存',
-                       },
-                       render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
-                       submitButtonProps: {
-                         size: 'large',
-                       },
-                     }}
-                     scrollToFirstError
+            <Form form={baseForm} layout={'horizontal'} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}
+                  onFinish={submitService}
+                  validateMessages={{
+                    required: '此项为必填项',
+                  }}
+                  submitter={{
+                    searchConfig: {
+                      submitText: '保存',
+                    },
+                    render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
+                    submitButtonProps: {
+                      size: 'large',
+                    },
+                  }}
+                  scrollToFirstError
             >
               <ProFormText
                 name='name'
@@ -180,7 +181,7 @@ const ServiceForm = props => {
                 width={'lg'}
                 label='关键字'
                 mode={'tags'}
-                fieldProps={{open:false}}
+                fieldProps={{ open: false }}
                 placeholder=''
                 extra={'用于搜索引擎优化，可输入多个，回车分隔。例如北京上门保洁、北京冰箱清洗等'}
               />
@@ -195,16 +196,16 @@ const ServiceForm = props => {
                                }));
                              }}
               />
-              <ProFormCheckbox.Group name='tags' label='服务标签'
-                                     request={async () => {
-                                       const { data: tagList } = await ServiceTagApi.list();
-                                       return tagList?.map(({ _id, name, color }) => ({
-                                         value: _id,
-                                         label: <Tag color={color}>{name}</Tag>,
-                                       }));
-                                     }}
+              <ProFormSelect name='tags' label='服务标签' mode={'multiple'} width={'md'}
+                             request={async () => {
+                               const { data: tagList } = await ServiceTagApi.list();
+                               return tagList?.map(({ _id, name }) => ({
+                                 value: _id,
+                                 label: name,
+                               }));
+                             }}
               />
-              <ProFormDigit name={'virtual_sales'} label={'虚拟销量'} min={0} initialValue={0}
+              <ProFormDigit name={'virtual_sales'} label={'虚拟销量'} min={0} initialValue={0} width={'xs'}
                             fieldProps={{ precision: 0 }} />
               <ProForm.Item
                 label='服务规格'
@@ -258,10 +259,11 @@ const ServiceForm = props => {
               <ProForm.Item name={'pics'} label={'轮播图'}>
                 <MaterialPicker mode={'multi'} />
               </ProForm.Item>
-              <ProForm.Item name={'service_content'} label={'服务详情'}>
+              <Form.Item name={'service_content'} label={'服务详情'}>
                 <MyEditor />
-              </ProForm.Item>
-            </ProForm>}
+              </Form.Item>
+              <Button htmlType={'submit'}>提交</Button>
+            </Form>}
         </ProCard>
       </Spin>
     </PageContainer>

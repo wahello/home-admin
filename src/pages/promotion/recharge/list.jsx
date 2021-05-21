@@ -8,90 +8,6 @@ import RechargeApi from '@/services/promotion/recharge';
 import ProCard from '@ant-design/pro-card';
 import Enums from '@/utils/enums';
 
-const recordColumns = [
-  {
-    title: '充值单号',
-    dataIndex: 'recharge_no',
-    width: 200,
-    align: 'center',
-    order: 3,
-  },
-  {
-    title: '付款渠道',
-    dataIndex: 'channel',
-    align: 'center',
-    order: 2,
-    valueType: 'select',
-    valueEnum: Enums.payChannel,
-    render: (_, entity) => {
-      const payChannel = Enums.payChannel[entity.channel];
-      return payChannel?<Space size={'small'}>
-        {payChannel.icon}
-        <span>{payChannel.text}</span>
-      </Space>:'-';
-    },
-  },
-  {
-    title: '充值用户',
-    dataIndex: 'userInfo',
-    hideInSearch: true,
-    align: 'center',
-    render: userInfo => {
-      return <Space>
-        <Avatar src={userInfo.avatar} />
-        <Space direction={'vertical'}>
-          <b>{userInfo.nickname}</b>
-          <span>{userInfo.mobile}</span>
-        </Space>
-      </Space>;
-    },
-  },
-  {
-    title: '充值面额',
-    dataIndex: 'money',
-    align: 'center',
-    valueType: 'money',
-    hideInSearch: true,
-  },
-  {
-    title: '赠送余额',
-    dataIndex: 'send_balance',
-    align: 'center',
-    valueType: 'money',
-    hideInSearch: true,
-  },
-  {
-    title: '赠送积分',
-    dataIndex: 'send_integral',
-    align: 'center',
-    hideInSearch: true,
-  },
-  {
-    title: '赠送优惠券',
-    dataIndex: 'send_coupons',
-    width: 200,
-    align: 'center',
-    hideInSearch: true,
-    render: it => {
-      return it.length ?
-        <Space direction={'vertical'}>{it.map(coupon => <Tag color={'blue'}>{coupon.name}</Tag>)}</Space> : '-';
-    },
-  },
-  {
-    title: '充值状态',
-    dataIndex: 'state',
-    width: 200,
-    align: 'center',
-    valueEnum: Enums.payState,
-    order: 1,
-  },
-  {
-    title: '充值时间',
-    dataIndex: '_add_time_str',
-    align: 'center',
-    hideInSearch: true,
-  },
-];
 
 
 const RechargeList = props => {
@@ -182,33 +98,20 @@ const RechargeList = props => {
       </Space>),
     }];
   return <PageContainer>
-    <ProCard tabs={{type:'card'}}>
-      <ProCard.TabPane key="tab1" tab="充值套餐">
-        <ProTable
-          size={'small'}
-          actionRef={configTabRef} request={RechargeApi.page} search={false} toolBarRender={() => [
-          <Button
-            type='primary'
-            key='primary'
-            onClick={() => history.push('./add')}
-          >
-            <PlusOutlined /> 新建
-          </Button>,
-        ]}
-          rowKey='_id'
-          columns={columns}
-        />
-      </ProCard.TabPane>
-      <ProCard.TabPane key="tab2" tab="充值记录">
-        <ProTable
-          size={'small'}
-          actionRef={configTabRef} request={RechargeApi.pageRecord}
-          rowKey='_id'
-          columns={recordColumns}
-        />
-      </ProCard.TabPane>
-
-    </ProCard>
+    <ProTable
+      size={'small'}
+      actionRef={configTabRef} request={RechargeApi.page} search={false} toolBarRender={() => [
+      <Button
+        type='primary'
+        key='primary'
+        onClick={() => history.push('./add')}
+      >
+        <PlusOutlined /> 新建
+      </Button>,
+    ]}
+      rowKey='_id'
+      columns={columns}
+    />
   </PageContainer>;
 };
 

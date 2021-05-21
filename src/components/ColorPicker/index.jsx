@@ -34,7 +34,7 @@ const ColorPicker = props => {
           <div className={styles.color} />
         </div>
       </Popover>
-      <Button size={'small'} onClick={setTrans} type={'link'}>透明</Button>
+      {props.allowTrans&&<Button size={'small'} onClick={setTrans} type={'link'}>透明</Button>}
     </Space>
 
   );
@@ -43,6 +43,10 @@ const ColorPicker = props => {
 ColorPicker.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
+  allowTrans:PropTypes.bool
 };
+ColorPicker.defaultProps={
+  allowTrans:true
+}
 
 export default ColorPicker;

@@ -105,12 +105,6 @@ const ServiceList = props => {
 
   const columns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-      width: 50,
-    },
-    {
       title: '服务名称',
       dataIndex: 'name',
       render: (text, record) => {

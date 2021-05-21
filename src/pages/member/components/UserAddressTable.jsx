@@ -19,8 +19,16 @@ const UserAddressTable = ({ userId }) => {
 
   const columns = [
     {
+      dataIndex: 'name',
+      title: '联系人',
+    },
+    {
+      dataIndex: 'mobile',
+      title: '联系方式',
+    },
+    {
       dataIndex: 'location',
-      title: '联系地址',
+      title: '地址',
       render: (location, { default_flag }) => {
         return <Space>
           <span>{location}</span>
@@ -29,12 +37,8 @@ const UserAddressTable = ({ userId }) => {
       },
     },
     {
-      dataIndex: 'name',
-      title: '联系人',
-    },
-    {
-      dataIndex: 'mobile',
-      title: '联系方式',
+      dataIndex: 'detail_address',
+      title: '门牌号',
     },
     {
       dataIndex: 'option',
@@ -59,6 +63,7 @@ const UserAddressTable = ({ userId }) => {
       rowKey='_id'
       pagination={{ pageSize: 10 }}
       columns={columns}
+      search={false}
     />
     <EditUserAddress address={editAddress} onFinish={() => {
       tableRef?.current.reload();

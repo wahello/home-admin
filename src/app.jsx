@@ -1,12 +1,11 @@
 import { PageLoading } from '@ant-design/pro-layout';
-import { ConfigProvider, Image, message, notification } from 'antd';
-import { history, Link } from 'umi';
+import { ConfigProvider, message, notification } from 'antd';
+import { history } from 'umi';
 import RightContent from '@/components/RightContent';
-import Footer from '@/components/Footer';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import LoginApi from '@/services/login';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import logo from '@/assets/logo-white.svg';
 
 moment.locale('zh-cn');
 
@@ -27,10 +26,11 @@ export async function getInitialState() {
   const initInfo = async () => {
     try {
       const {
-        data,
+        userInfo,
       } = await LoginApi.currentUser();
-      return data;
+      return { userInfo };
     } catch (error) {
+      console.error(error);
       history.push(loginPath);
     }
     return undefined;
@@ -62,7 +62,6 @@ export const layout = ({ initialState }) => {
     footerRender: false,
     onPageChange: () => {
       const { location } = history;
-      // 如果没有登录，重定向到 login
       if (!initialState?.userInfo && location.pathname !== loginPath) {
         history.push(loginPath);
       }
@@ -71,7 +70,7 @@ export const layout = ({ initialState }) => {
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
-    logo: <img src={'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'} />,
+    logo: <img src={logo} />,
   };
 };
 
@@ -109,7 +108,6 @@ const errorCodeMessage = {
   60401: '获取支付宝信息失败',
   60402: '此账号已被绑定',
   90001: '获取数据异常',
-  [-1]: '数据不存在',
 };
 
 /** 异常处理程序

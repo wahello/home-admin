@@ -6,6 +6,11 @@ const LoginApi = {
       data,
     });
   },
+  logout: async (data) => {
+    return request('user/pub/logout', {
+      data,
+    });
+  },
   getNeedCaptcha: async (data) => {
     return request('user/getNeedCaptcha', {
       method: 'POST',
@@ -18,7 +23,7 @@ const LoginApi = {
     });
   },
   currentUser: async (data) => {
-    return request('admin/user/kh/currentUser', {
+    return request('user/kh/getMyUserInfo', {
       data,
     });
   },

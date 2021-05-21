@@ -43,13 +43,18 @@ const MaterialPicker = props => {
     listRef?.current?.reset();
   }, [currentKey]);
 
+  useEffect(() => {
+    if (props.destroyOnClose) {
+      setCheckItems([]);
+    }
+  }, [props.destroyOnClose, visible]);
 
   useEffect(() => {
     if (props.value) {
       if (typeof props.value === 'string') {
         setCheckItems([props.value]);
-      }else{
-        setCheckItems(props.value)
+      } else {
+        setCheckItems(props.value);
       }
     }
     setCheckItems([]);
@@ -120,9 +125,9 @@ const MaterialPicker = props => {
 
   const removeImage = idx => {
 
-    if (typeof props.value ==='string') {
-      props.onChange(null)
-    }else{
+    if (typeof props.value === 'string') {
+      props.onChange(null);
+    } else {
       const newImages = [...props.value];
       newImages.splice(idx, 1);
       props.onChange(newImages);
@@ -202,11 +207,13 @@ MaterialPicker.propTypes = {
   maxCount: PropTypes.number,
   customRender: PropTypes.func,
   size: PropTypes.number,
+  destroyOnClose: PropTypes.bool,
 };
 MaterialPicker.defaultProps = {
   mode: 'single',
   maxCount: 9,
   size: 85,
+  destroyOnClose: false,
 };
 
 export default MaterialPicker;

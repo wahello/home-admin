@@ -13,5 +13,8 @@ const MaterialApi = {
   remove: async (data) => {
     return request('admin/material/sys/remove', { data });
   },
+  move: async (data) => {
+    return request('admin/material/sys/move', { data });
+  },
 };
 export default MaterialApi;

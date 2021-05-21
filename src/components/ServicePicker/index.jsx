@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Image, Modal } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import ServiceApi from '@/services/shop/service';
@@ -51,13 +51,18 @@ const ServicePicker = props => {
 
   const onSelectRow = (keys, rows) => {
     setSelectedRowKeys(keys);
-    const newRows = [...selectedRows];
-    rows.filter(it => !!it).forEach(row => {
-      if (!newRows.find(it => it._id === row._id)) {
-        newRows.push(row);
-      }
-    });
-    setSelectedRows(newRows);
+
+    if (rows.length) {
+      const newRows = [...selectedRows];
+      rows.filter(it => !!it).forEach(row => {
+        if (!newRows.find(it => it._id === row._id)) {
+          newRows.push(row);
+        }
+      });
+      setSelectedRows(newRows);
+    }else{
+      setSelectedRows([]);
+    }
   };
   const onOk = () => {
     if (props.single) {

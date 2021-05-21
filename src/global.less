@@ -13,17 +13,26 @@ body,
 .ant-layout {
   min-height: 100vh;
 }
+
 .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
   left: unset;
 }
-.ant-table{
-  .ant-btn-link{
-    padding: 0!important;
+
+.ant-table {
+  .ant-btn-link {
+    padding: 0 !important;
   }
 }
-.ant-pro-footer-bar-right{
+
+.ant-pro-footer-bar-right {
   width: 100%;
 }
+
+.ant-pro-global-header-layout-mix {
+  background: linear-gradient(90deg, #1d42ab, #2173dc, #1e93ff) !important;
+  color:rgba(69,156,252)
+}
+
 
 canvas {
   display: block;
@@ -33,6 +42,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
 }
 
 ul,
@@ -44,11 +54,13 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
+
     &-thead > tr,
     &-tbody > tr {
       > th,
       > td {
         white-space: pre;
+
         > span {
           display: block;
         }
@@ -63,3 +75,12 @@ ol {
     min-height: 100vh;
   }
 }
+
+.amap-logo {
+  visibility: hidden;
+}
+
+.amap-copyright {
+  visibility: hidden !important;
+}
+

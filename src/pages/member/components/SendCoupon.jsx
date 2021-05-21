@@ -5,6 +5,7 @@ import { Form } from 'antd';
 import CouponApi from '@/services/promotion/coupon';
 import Enums from '@/utils/enums';
 import MemberApi from '@/services/member';
+import CouponSelect from '@/components/CouponSelect';
 
 const SendCoupon = ({ userId, visible, onVisibleChange, onFinish }) => {
   const [form] = Form.useForm();
@@ -16,24 +17,12 @@ const SendCoupon = ({ userId, visible, onVisibleChange, onFinish }) => {
   return (
     <ModalForm form={form} width={400} title={'发放优惠券'} visible={visible} onVisibleChange={onVisibleChange}
                onFinish={onSubmit}>
-      <ProFormSelect
+      <CouponSelect
         width={'md'}
         name='couponId'
         label='选择要发放的优惠券'
         placeholder='请选择'
         rules={[{ required: true, message: '请选择优惠券' }]}
-        fieldProps={{
-          filterOption: (inputValue, { label }) => {
-            return label.indexOf(inputValue) >= 0;
-          },
-        }}
-        request={async () => {
-          const { data: couponList } = await CouponApi.list();
-          return couponList?.map(it => ({
-            value: it._id,
-            label: `${it.name}  ${Enums.discountType[it.discount.type].text}`,
-          }));
-        }}
       />
     </ModalForm>
   );

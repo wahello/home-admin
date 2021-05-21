@@ -54,9 +54,9 @@ const ServiceCategoryList = () => {
     {
       title: '分类图标',
       dataIndex: 'pic',
-      render:(it,{parent_id})=>{
-        return parent_id&&<Image src={it} width={50} height={50}/>
-      }
+      render: (it, { parent_id }) => {
+        return parent_id && <Image src={it} width={50} height={50} />;
+      },
     },
     {
       title: '是否显示',
@@ -94,15 +94,29 @@ const ServiceCategoryList = () => {
             return !!record.children?.length;
           },
         }}
-        actionRef={tableRef} request={ServiceCategoryApi.list} toolBarRender={() => [
-        <Button
-          type='primary'
-          key='primary'
-          onClick={() => setFormVisible(true)}
-        >
-          <PlusOutlined /> 新建
-        </Button>,
-      ]}
+        actionRef={tableRef} request={ServiceCategoryApi.list}
+        postData={items => {
+          return items.map(item => {
+            return {
+              ...item,
+              children: item.children.map(child => {
+                return {
+                  ...child,
+                  children: child.children.length ? child.children : undefined,
+                };
+              }),
+            };
+          });
+        }}
+        toolBarRender={() => [
+          <Button
+            type='primary'
+            key='primary'
+            onClick={() => setFormVisible(true)}
+          >
+            <PlusOutlined /> 新建
+          </Button>,
+        ]}
         rowKey='_id'
         columns={columns}
       />

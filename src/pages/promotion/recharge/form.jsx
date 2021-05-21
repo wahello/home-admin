@@ -5,8 +5,8 @@ import { Button, Form, message, Result, Spin } from 'antd';
 import ProForm, { ProFormDigit } from '@ant-design/pro-form';
 import { useRequest } from '@@/plugin-request/request';
 import { history } from '@@/core/history';
-import CouponFormItem from '@/pages/promotion/recharge/components/CouponFormItem';
 import RechargeApi from '@/services/promotion/recharge';
+import CouponSelect from '@/components/CouponSelect';
 
 
 const RechargeForm = props => {
@@ -31,7 +31,6 @@ const RechargeForm = props => {
     try {
       const submitValues = {
         ...values,
-        coupons: values.coupons?.map(it => it._id),
       };
       if (id) {
         await RechargeApi.update({ id, recharge: submitValues });
@@ -90,9 +89,13 @@ const RechargeForm = props => {
                 placeholder='请输入赠送余额'
                 fieldProps={{ precision: 0 }}
               />
-              <ProForm.Item label={'赠送优惠券'} name={'coupons'}>
-                <CouponFormItem />
-              </ProForm.Item>
+              <CouponSelect
+                width={'md'}
+                name='coupons'
+                label='赠送优惠券'
+                placeholder='请选择'
+                mode={'multiple'}
+              />
             </ProForm>}
         </ProCard>
       </Spin>

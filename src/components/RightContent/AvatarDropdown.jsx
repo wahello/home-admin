@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Menu, Spin } from 'antd';
+import { Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { outLogin } from '@/services/ant-design-pro/api';
+import LoginApi from '@/services/login';
 
 
 /**
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await outLogin();
+  await LoginApi.logout();
   const { query = {}, pathname } = history.location;
   const { redirect } = query;
   if (window.location.pathname !== '/user/login' && !redirect) {
@@ -44,7 +44,7 @@ const AvatarDropdown = ({ menu }) => {
   const loading = (
     <span className={`${styles.action} ${styles.account}`}>
       <Spin
-        size="small"
+        size='small'
         style={{
           marginLeft: 8,
           marginRight: 8,
@@ -66,20 +66,20 @@ const AvatarDropdown = ({ menu }) => {
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
       {menu && (
-        <Menu.Item key="center">
+        <Menu.Item key='center'>
           <UserOutlined />
           个人中心
         </Menu.Item>
       )}
       {menu && (
-        <Menu.Item key="settings">
+        <Menu.Item key='settings'>
           <SettingOutlined />
           个人设置
         </Menu.Item>
       )}
       {menu && <Menu.Divider />}
 
-      <Menu.Item key="logout">
+      <Menu.Item key='logout'>
         <LogoutOutlined />
         退出登录
       </Menu.Item>
@@ -88,7 +88,6 @@ const AvatarDropdown = ({ menu }) => {
   return (
     <HeaderDropdown overlay={menuHeaderDropdown}>
       <span className={`${styles.action} ${styles.account}`}>
-        <Avatar size="small" className={styles.avatar} src={userInfo.avatar||<UserOutlined />} alt="avatar" />
         <span className={`${styles.name} anticon`}>{userInfo.username}</span>
       </span>
     </HeaderDropdown>

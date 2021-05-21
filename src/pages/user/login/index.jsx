@@ -6,6 +6,7 @@ import { history, Link, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import styles from './index.less';
 import LoginApi from '@/services/login';
+import logo from '@/assets/logo-white.svg';
 
 
 const goto = () => {
@@ -13,7 +14,7 @@ const goto = () => {
   setTimeout(() => {
     const { query } = history.location;
     const { redirect } = query;
-    history.push(redirect || '/');
+    history.push(redirect||'/')
   }, 10);
 };
 
@@ -27,7 +28,7 @@ const Login = () => {
   const fetchInitInfo = async () => {
     const initInfo = await initialState?.initInfo?.();
     if (initInfo) {
-      setInitialState({ ...initialState, initInfo });
+      setInitialState({ ...initialState, ...initInfo });
     }
   };
 
@@ -55,12 +56,11 @@ const Login = () => {
         <div className={styles.top}>
           <div className={styles.header}>
             <Link to='/'>
-              <img alt='logo' className={styles.logo} src='/logo.svg' />
-              <span className={styles.title}>Ant Design</span>
+              <img alt='logo' className={styles.logo} src={'/logo.svg'} />
+              <span className={styles.title}>优速到家</span>
             </Link>
           </div>
         </div>
-
         <div className={styles.main}>
           <ProForm
             submitter={{

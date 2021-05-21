@@ -4,7 +4,7 @@ import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { useRequest } from 'umi';
 import { Form, Spin } from 'antd';
 import ServiceTagApi from '@/services/shop/service-tag';
-import ColorPicker from '@/components/ColorPicker';
+
 const ServiceTagForm = ({ id, visible, onVisibleChange, onFinish }) => {
   const [form] = Form.useForm();
   const { data, loading, error } = useRequest(() => {

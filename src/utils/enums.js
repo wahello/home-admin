@@ -144,7 +144,7 @@ const Enums = {
     balance: {
       text: '余额支付',
       value: 'balance',
-      icon: <WalletOutlined style={{fontSize:20,color:'#ff9900'}}   />,
+      icon: <WalletOutlined style={{ fontSize: 20, color: '#ff9900' }} />,
     },
     offline: {
       text: '线下支付',
@@ -213,6 +213,106 @@ const Enums = {
     FAILED: {
       text: '退款失败',
       value: 'FAILED',
+    },
+  },
+  giftType: {
+    COUPON: {
+      text: '优惠券',
+      value: 'COUPON',
+    },
+    BALANCE: {
+      text: '余额红包',
+      value: 'BALANCE',
+    },
+    INTEGRAL: {
+      text: '积分',
+      value: 'INTEGRAL',
+    },
+  },
+  accountType: {
+    INTEGRAL: {
+      text: '积分',
+      value: 'INTEGRAL',
+    },
+    BALANCE: {
+      text: '余额',
+      value: 'BALANCE',
+    },
+  },
+  accountAction: {
+    REGISTER: {
+      text: '注册',
+      value: 'REGISTER',
+    },
+    CONSUME: {
+      text: '消费',
+      value: 'CONSUME',
+    },
+    CONSUME_REWARD: {
+      text: '消费奖励',
+      value: 'CONSUME_REWARD',
+    },
+    SYSTEM: {
+      text: '系统调整',
+      value: 'SYSTEM',
+    },
+    LUCKY: {
+      text: '抽奖',
+      value: 'LUCKY',
+    },
+    RECHARGE: {
+      text: '充值',
+      value: 'RECHARGE',
+    },
+    REFUND: {
+      text: '退还',
+      value: 'REFUND',
+    },
+  },
+  gender: {
+    MAN: {
+      text: '男',
+      value: '1',
+    },
+    WOMAN: {
+      text: '女',
+      value: '2',
+    },
+    UNKNOWN: {
+      text: '未知',
+      value: '0',
+    },
+  },
+  withdrawState: {
+    WAIT_AGREE: {
+      text: '待审核',
+      value: 'WAIT_AGREE',
+    },
+    WAIT_PAY: {
+      text: '待转账',
+      value: 'WAIT_PAY',
+    },
+    PAID: {
+      text: '已转账',
+      value: 'PAID',
+    },
+    REJECT: {
+      text: '已拒绝',
+      value: 'REJECT',
+    },
+  },
+  rebateRecordState: {
+    WAIT_COMPLETE: {
+      text: '待订单完成',
+      value: 'WAIT_COMPLETE',
+    },
+    COMPLETE: {
+      text: '订单已完成',
+      value: 'COMPLETE',
+    },
+    CANCELED: {
+      text: '订单已取消',
+      value: 'CANCELED',
     },
   },
 };
