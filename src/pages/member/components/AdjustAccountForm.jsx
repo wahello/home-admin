@@ -5,7 +5,7 @@ import { Form } from 'antd';
 import MemberApi from '@/services/member';
 import Enums from '@/utils/enums';
 
-const AdjustAccountForm = ({ type, user, visible, onVisibleChange, onFinish }) => {
+const AdjustAccountForm = ({ type, member, visible, onVisibleChange, onFinish }) => {
   const [form] = Form.useForm();
 
   const adjustType = useMemo(() => {
@@ -13,25 +13,25 @@ const AdjustAccountForm = ({ type, user, visible, onVisibleChange, onFinish }) =
   }, [type]);
 
   useEffect(() => {
-    if (user) {
+    if (member&&visible) {
       form.setFieldsValue({
-        value: adjustType === Enums.accountType.BALANCE ? user.balance : user.integral,
+        nowValue: adjustType === Enums.accountType.BALANCE ? member.balance : member.integral,
       });
     }
-  }, [user, adjustType]);
+  }, [member, adjustType,visible]);
 
 
   const rangeLimit = useMemo(() => {
     if (adjustType === Enums.accountType.BALANCE) {
-      return { min: -user?.balance };
+      return { min: -member?.balance };
     }
-    return { min: -user?.integral };
+    return { min: -member?.integral };
 
-  }, [user, adjustType]);
+  }, [member, adjustType]);
 
-  const onSubmit = async ({ adjustValue, remark }) => {
-    if (adjustValue)
-      await MemberApi.adjustAccount({ userId: user._id, type, adjustValue, remark });
+  const onSubmit = async ({ value, remark }) => {
+    if (value)
+      await MemberApi.adjustAccount(member.id, { type, value, remark });
     return onFinish();
   };
 
@@ -40,11 +40,11 @@ const AdjustAccountForm = ({ type, user, visible, onVisibleChange, onFinish }) =
     <ModalForm form={form} width={500} title={`调整${adjustType.text}`} layout={'horizontal'} labelCol={{ span: 6 }}
                wrapperCol={{ span: 18 }}
                visible={visible} onVisibleChange={onVisibleChange}
-               onFinish={onSubmit}>
-      <ProFormField readonly name={'value'} label={`当前${adjustType.text}`} />
+               onFinish={onSubmit} modalProps={{destroyOnClose:true}}>
+      <ProFormField readonly name={'nowValue'} label={`当前${adjustType.text}`} />
       <ProFormDigit
         width={'xs'}
-        name='adjustValue'
+        name='value'
 
         {...rangeLimit}
         label='调整数额'
@@ -64,7 +64,7 @@ const AdjustAccountForm = ({ type, user, visible, onVisibleChange, onFinish }) =
 };
 
 AdjustAccountForm.propTypes = {
-  user: PropTypes.object,
+  member: PropTypes.object,
   type: PropTypes.string,
   visible: PropTypes.bool.isRequired,
   onFinish: PropTypes.func.isRequired,

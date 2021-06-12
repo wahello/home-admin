@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Space, Tag } from 'antd';
+import { Modal, Tag } from 'antd';
 import { useBoolean } from 'ahooks';
 import ServicePicker from '@/components/ServicePicker';
+import GroupPicker from '@/components/GroupPicker';
 
 
 const types = {
@@ -82,6 +83,13 @@ const pageData = [{
     paramType: 'service',
     needParam: true,
     params: null,
+  }, {
+    name: '拼团商品',
+    path: '/servicePages/service',
+    type: types.navigateTo,
+    paramType: 'group',
+    needParam: true,
+    params: null,
   }],
 }];
 
@@ -89,13 +97,14 @@ const LinkPicker = props => {
   const [visible, toggleVisible] = useBoolean(false);
   const [checkedPage, setCheckedPage] = useState();
   const [serviceVisible, toggleServiceVisible] = useBoolean(false);
+  const [groupVisible, toggleGroupVisible] = useBoolean(false);
 
   useEffect(() => {
     setCheckedPage(props.value);
   }, [props.value]);
 
   const changeTag = (page) => {
-    if (checkedPage?.path !== page.path) {
+    if (checkedPage?.name !== page.name) {
       setCheckedPage(page);
     } else if (!page.needParam) {
       setCheckedPage(null);
@@ -104,6 +113,9 @@ const LinkPicker = props => {
       switch (page.paramType) {
         case 'service':
           toggleServiceVisible.setTrue();
+          break;
+        case 'group':
+          toggleGroupVisible.setTrue();
           break;
         default:
           break;
@@ -126,7 +138,7 @@ const LinkPicker = props => {
         ...checkedPage,
         paramName: service.name,
         params: {
-          id: service._id,
+          id: service.id,
         },
       });
     } else {
@@ -140,6 +152,31 @@ const LinkPicker = props => {
     }
     toggleServiceVisible.setFalse();
   };
+
+
+  const cancelSelectGroup = () => {
+    if (!checkedPage.params) {
+      setCheckedPage(null);
+    }
+    toggleGroupVisible.setFalse();
+  };
+
+  const selectGroup = group => {
+    toggleGroupVisible.setFalse();
+    if (group) {
+      setCheckedPage({
+        ...checkedPage,
+        paramName: group.name,
+        params: {
+          id: group.serviceId,
+          groupId: group.id,
+        },
+      });
+    } else {
+      setCheckedPage(null);
+    }
+  };
+
 
   const displayName = useMemo(() => {
     if (props.value) {
@@ -158,16 +195,18 @@ const LinkPicker = props => {
           <div>
             {it.pages.map(page => <Tag style={{ fontSize: 14, margin: 15, cursor: 'pointer' }}
                                        onClick={() => changeTag(page)}
-                                       color={checkedPage?.path === page.path ? '#2D8CF0' : 'default'}
-                                       key={page.path}
+                                       color={checkedPage?.name === page.name ? '#2D8CF0' : 'default'}
+                                       key={page.name}
             >
-              {checkedPage?.path === page.path ? `${checkedPage.name}${checkedPage.paramName ? `(${checkedPage.paramName})` : ''}` : page.name}
+              {checkedPage?.name === page.name ? `${checkedPage.name}${checkedPage.paramName ? `(${checkedPage.paramName})` : ''}` : page.name}
             </Tag>)}
           </div>
         </>)}
     </Modal>
     <ServicePicker value={checkedPage?.params} visible={serviceVisible} onCancel={cancelSelectService}
                    onChange={selectService} single />
+    <GroupPicker value={checkedPage?.params} visible={groupVisible} onCancel={cancelSelectGroup}
+                 onChange={selectGroup} single />
     <Tag color={'#2D8CF0'} style={{ maxWidth: 150, textOverflow: 'ellipsis', overflow: 'hidden' }}
          onClick={toggleVisible.setTrue}>{displayName}</Tag>
   </>;

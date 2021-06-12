@@ -2,22 +2,38 @@ import { request } from 'umi';
 
 const PosterApi = {
   add: async (data) => {
-    return request('admin/promotion/poster/sys/add', { data });
+    return request('/api/poster', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/promotion/poster/sys/update', { data });
+    return request('/api/poster', {
+      method: 'POST',
+      data,
+    });
   },
   page: async (data) => {
-    return request('admin/promotion/poster/sys/page',{data});
+    return request('/api/poster/page', {
+      method: 'POST',
+      data,
+    });
   },
-  get: async (data) => {
-    return request('admin/promotion/poster/sys/get', { data });
+  get: async (id) => {
+    return request(`/api/poster/${id}`, {
+      method: 'GET',
+    });
   },
-  remove: async (data) => {
-    return request('admin/promotion/poster/sys/remove', { data });
+  remove: async (id) => {
+    return request(`/api/poster/${id}`, {
+      method: 'DELETE',
+    });
   },
   gen: async (data) => {
-    return request('admin/promotion/poster/sys/gen', { data });
+    return request('/api/poster/gen', {
+      method: 'POST',
+      data,
+    });
   },
 };
 export default PosterApi;

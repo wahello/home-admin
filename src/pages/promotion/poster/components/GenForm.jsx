@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ModalForm, ProFormDependency, ProFormDigit, ProFormRadio } from '@ant-design/pro-form';
+import { ModalForm, ProFormDigit, ProFormRadio } from '@ant-design/pro-form';
 import { Form, message } from 'antd';
 import PosterApi from '@/services/promotion/poster';
 import dayjs from 'dayjs';
@@ -13,7 +13,8 @@ const loadImg = (url) => {
     image.onload = () => {
       resolve(image);
     };
-    image.onerror = () => {
+    image.onerror = (e) => {
+      console.log(e);
       reject(new Error('加载图片失败'));
     };
   });
@@ -40,7 +41,7 @@ const GenForm = ({ poster, visible, onVisibleChange }) => {
       content.drawImage(qrCode, poster.code.left, poster.code.top, poster.code.size, poster.code.size);
       const canvasUrl = canvas.toDataURL('image/png');
       document.body.appendChild(downLink);
-      downLink.download = poster.name + dayjs().unix(); // 设置下载的文件名
+      downLink.download = poster.name + dayjs().format('YYYY-MM-DD'); // 设置下载的文件名
       downLink.href = canvasUrl;
       downLink.click();
     } finally {
@@ -53,7 +54,7 @@ const GenForm = ({ poster, visible, onVisibleChange }) => {
     const hide = message.loading('生成海报中，请耐心等待');
     try {
       const { data: codeArr } = await PosterApi.gen({
-        posterId: poster._id,
+        posterId: poster.id,
         ...values,
       });
       const backgroundImg = await loadImg(poster.pic);
@@ -73,22 +74,18 @@ const GenForm = ({ poster, visible, onVisibleChange }) => {
     <ModalForm form={form} width={500} title='生成海报' visible={visible} layout={'horizontal'}
                labelCol={{ span: 6 }} wrapperCol={{ span: 14 }}
                onVisibleChange={onVisibleChange}
-               onFinish={onSubmit}>
+               onFinish={onSubmit} modalProps={{ centered: true }}>
 
       <ProFormRadio.Group
         width='md'
         name='type'
-        label='类型'
+        label='用途'
         initialValue={'NORMAL'}
-        options={[{ label: '普通', value: 'NORMAL' }, { label: '渠道推广', value: 'CHANNEL' },{ label: '指定用户', value: 'USER' }]}
+        options={[{ label: '普通', value: 'NORMAL' }, { label: '渠道推广', value: 'CHANNEL' }]}
+        extra={'普通不绑定邀请码，渠道推广包含邀请码，第一个扫码的客户会默认成为渠道客户，后续所有通过该海报注册的用户皆为该渠道客户的邀请用户'}
       />
-      <ProFormDependency name={['type']}>
-        {({ type }) => {
-          return type === 'NEW' ?
-            <ProFormDigit name={'num'} width={'xs'} max={10} min={1} initialValue={1} fieldProps={{ precision: 0 }}
-                          label={'生成数量'} /> : null;
-        }}
-      </ProFormDependency>
+      <ProFormDigit name={'num'} width={'xs'} max={10} min={1} initialValue={1} fieldProps={{ precision: 0 }}
+                    label={'生成数量'} />
     </ModalForm>
   );
 };

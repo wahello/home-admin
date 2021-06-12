@@ -11,7 +11,7 @@ export default {
   "menu": {
     "locale": false
   },
-  "headerHeight": 48,
+  "headerHeight": 64,
   'splitMenus': false,
-  'siderWidth':150
+  'siderWidth':200
 };

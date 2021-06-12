@@ -23,18 +23,6 @@ const OrderList = props => {
   const tableRef = useRef();
   const [activeKey, setActiveKey] = useState();
 
-  const removeRecord = async id => {
-    const hide = message.loading('正在删除');
-    try {
-      await OrderApi.remove({ id });
-      message.success('删除成功');
-      tableRef?.current?.reload();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      hide();
-    }
-  };
 
   const changeTab = key => {
     if (key === 'all') {
@@ -94,31 +82,30 @@ const OrderList = props => {
   const columns = [
     {
       title: '订单号',
-      dataIndex: 'order_no',
-      width: 220,
-      render: (v, { type,platform }) => <Space size={'small'} direction={'vertical'}>
+      dataIndex: 'orderNo',
+      width: 270,
+      render: (v, { orderType, platform }) => <Space size={'small'} >
         <span>{v}</span>
-        <Space size={'small'}>
-          {type!==Enums.orderType.NORMAL.value&&<Tag color={Enums.orderType[type]?.color}>{Enums.orderType[type]?.text}</Tag>}
-          {Enums.platform[platform].icon}
-        </Space>
+
+          {orderType !== Enums.orderType.NORMAL.value &&
+          <Tag color={Enums.orderType[orderType]?.color}>{Enums.orderType[orderType]?.text}</Tag>}
       </Space>,
       copyable: true,
     },
     {
       title: '服务信息',
-      dataIndex: ['service','name'],
-      width: 350,
-      render: (_,{service}) => <ServiceItem service={service} />,
+      dataIndex: 'service',
+      width: 300,
+      render: (_, { service,sku,num }) => <ServiceItem service={service} sku={sku} num={num} />,
     },
     {
       title: '地址',
       dataIndex: 'address',
-      width: 350,
+      width: 300,
       render: (it) => <div>
         <Space size={'small'} direction={'vertical'}>
           <Space>
-            <span>{it.name}</span>
+            <span>{it.contract}</span>
             <span>{it.mobile}</span>
           </Space>
           <span>{it.location}</span>
@@ -128,29 +115,29 @@ const OrderList = props => {
     },
     {
       title: '上门时间',
-      dataIndex: 'appoint_time',
+      dataIndex: 'appointTime',
       width: 150,
       valueType: 'dateTime',
     },
     {
       title: '支付模式',
-      dataIndex: ['service', 'pay', 'type'],
+      dataIndex: 'payType',
       valueEnum: Enums.payType,
       width: 100,
     },
     {
       title: '实付金额',
-      dataIndex: 'actual_fee',
-      width: 120,
+      dataIndex: 'actualFee',
       valueType: 'money',
-      hideInSearch:true
+      hideInSearch: true,
+      width: 100,
     },
     {
-      title: '已支付金额',
-      dataIndex: 'paid_fee',
-      width: 120,
+      title: '已付金额',
+      dataIndex: 'paidFee',
       valueType: 'money',
-      hideInSearch:true
+      hideInSearch: true,
+      width: 100,
     },
     {
       title: '状态',
@@ -162,7 +149,8 @@ const OrderList = props => {
     },
     {
       title: '下单时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       width: 150,
       hideInSearch: true,
     },
@@ -171,24 +159,34 @@ const OrderList = props => {
       dataIndex: 'option',
       valueType: 'option',
       align: 'center',
-      render: (_, { _id, state }) => (<Space>
-        <Button type={'link'} onClick={() => history.push(`/order/detail?id=${_id}`)}>详情</Button>
-        {state === Enums.orderState.WAIT_CONFIRM.value &&
-        <Popconfirm title={'确认订单?'} onConfirm={() => confirmOrder(_id)}>
-          <Button type={'link'}>确认</Button>
-        </Popconfirm>}
-        {state === Enums.orderState.WAIT_SERVICE.value &&
-        <Popconfirm title={'确认开始服务订单?'} onConfirm={() => serviceOrder(_id)}>
-          <Button type={'link'}>开始服务</Button>
-        </Popconfirm>
+      render: (_, { id, type,state,groupJoin }) => {
+        const orderState = Enums.orderState[state];
+        const orderType = Enums.orderType[type];
+        let canConfirm = orderState === Enums.orderState.WAIT_CONFIRM;
+        if (orderType === Enums.orderType.GROUP) {
+          if (groupJoin?.groupRecord?.state === Enums.groupRecordState.PROCESSING.value) {
+            canConfirm = false;
+          }
         }
-        {state === Enums.orderState.SERVICING.value &&
-        <Popconfirm title={'确认完成服务?'} onConfirm={() => serviceFinish(_id)}>
-          <Button type={'link'}>完成服务</Button>
-        </Popconfirm>
-        }
+        return <Space direction={'vertical'} size={'small'}>
+          <Button type={'link'} onClick={() => history.push(`/order/detail?id=${id}`)}>详情</Button>
+          {canConfirm &&
+          <Popconfirm title={'确认订单?'} onConfirm={() => confirmOrder(id)}>
+            <Button type={'link'}>确认</Button>
+          </Popconfirm>}
+          {orderState === Enums.orderState.WAIT_SERVICE &&
+          <Popconfirm title={'确认开始服务订单?'} onConfirm={() => serviceOrder(id)}>
+            <Button type={'link'}>开始服务</Button>
+          </Popconfirm>
+          }
+          {orderState === Enums.orderState.SERVICING &&
+          <Popconfirm title={'确认完成服务?'} onConfirm={() => serviceFinish(id)}>
+            <Button type={'link'}>完成服务</Button>
+          </Popconfirm>
+          }
 
-      </Space>),
+        </Space>;
+      },
     }];
   return (
     <PageContainer>
@@ -202,11 +200,12 @@ const OrderList = props => {
           <PlusOutlined /> 新建
         </Button>,
       ]}
-        rowKey='_id'
+        rowKey='id'
         columns={columns}
         expandable={{
           // expandedRowRender,
         }}
+        scroll={{x:1300}}
         search={{
           collapseRender: false,
           collapsed: false,

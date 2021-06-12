@@ -8,6 +8,7 @@ import { history } from '@@/core/history';
 import LuckyApi from '@/services/promotion/lucky';
 import MaterialPicker from '@/components/MaterialPicker';
 import GiftTable from '@/pages/promotion/lucky/components/GiftTable';
+import Enums from '@/utils/enums';
 
 
 const LuckyForm = props => {
@@ -15,19 +16,28 @@ const LuckyForm = props => {
   const [baseForm] = Form.useForm();
 
 
-
   const getRequest = useRequest(LuckyApi.get, { manual: true });
 
   useEffect(() => {
     if (id) {
       getRequest.run({ id });
+    } else {
+      baseForm.setFieldsValue({
+        gifts: [{
+          id: 1,
+          name: '谢谢参与',
+          tip: '好可惜啊，差一点就中奖了！',
+          type: Enums.giftType.NONE.value,
+          weight: 1,
+        }],
+      });
     }
   }, [id]);
   useEffect(() => {
     if (getRequest.data) {
       baseForm.setFieldsValue({
         ...getRequest.data,
-        effectiveTime:[getRequest.data.start_time,getRequest.data.end_time]
+        effectiveTime: [getRequest.data.start_time, getRequest.data.end_time],
       });
     }
   }, [getRequest.data]);
@@ -97,6 +107,7 @@ const LuckyForm = props => {
                 <ProFormDigit
                   name='integral_cost'
                   width={'sm'}
+                  min={1}
                   fieldProps={{ precision: 0 }}
                   rules={[{ required: true }]}
                   noStyle
@@ -113,33 +124,13 @@ const LuckyForm = props => {
                 />
                 <span> 次</span>
               </ProForm.Item>
-              <ProForm.Item label={'整体中奖概率'} required>
-                <ProFormDigit
-                  name='probability'
-                  width={'xs'}
-                  fieldProps={{ precision: 0 }}
-                  rules={[{ required: true }]}
-                  noStyle
-                />
-                <span> %</span>
-              </ProForm.Item>
-              <ProFormText
-                name='unwin_tip'
-                width={'md'}
-                label='未中奖提示语'
-                placeholder='请输入未中奖提示语'
-                initialValue={'很遗憾，未中奖'}
-                rules={[{ required: true }]}
-              />
-              <ProForm.Item name={'unwin_pic'} label={'未中奖图片'} rules={[{ required: true }]}>
-                <MaterialPicker />
-              </ProForm.Item>
+
               <ProForm.Item
                 label='奖品'
                 name='gifts'
                 initialValue={[]}
-                rules={[{ min: 1, msg: '最少设置一个奖品', type: 'array' }]}
-                extra={'最少设置1个奖品，最多设置7个奖品，其余将会由未中奖占位'}
+                rules={[{ min: 1, msg: '最少设置1个奖品', type: 'array' }, { max: 8, msg: '最多设置8个奖品', type: 'array' }]}
+                extra={'最少设置1个奖品，最多设置8个奖品'}
               >
                 <GiftTable />
               </ProForm.Item>

@@ -9,21 +9,21 @@ const columns = [{
   dataIndex: 'name',
   title: '服务名称',
 }, {
-  dataIndex: 'main_pic',
+  dataIndex: 'mainPic',
   title: '服务图片',
   hideInSearch: true,
   render: it => <Image src={it} width={40} height={40} preview={{ mask: false }} />,
 }, {
-  dataIndex: 'category',
   title: '服务分类',
-  render: text => {
-    return text.name;
-  },
+  dataIndex: 'categoryName',
+  valueType: 'select',
   request: async () => {
-    const { data } = await ServiceCategoryApi.list();
-    return data?.map(({ _id, name }) => ({
-      value: _id,
+    const { data: categoryList } = await ServiceCategoryApi.list();
+    return categoryList?.map(({ id, name, children }) => ({
+      value: id,
       label: name,
+      children: children.map(it => ({ value: it.id, label: it.name })),
+      optionType: 'optGroup',
     }));
   },
 }];
@@ -32,16 +32,15 @@ const ServicePicker = props => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
 
-
   useEffect(() => {
     const rowKeys = [];
     const rows = [];
     if (props.value) {
       if (Array.isArray(props.value)) {
-        rowKeys.push(...props.value.map(it => it._id));
+        rowKeys.push(...props.value.map(it => it.id));
         rows.push(...props.value);
       } else {
-        rowKeys.push(props.value._id);
+        rowKeys.push(props.value.id);
         rows.push(props.value);
       }
     }
@@ -51,16 +50,15 @@ const ServicePicker = props => {
 
   const onSelectRow = (keys, rows) => {
     setSelectedRowKeys(keys);
-
     if (rows.length) {
       const newRows = [...selectedRows];
       rows.filter(it => !!it).forEach(row => {
-        if (!newRows.find(it => it._id === row._id)) {
+        if (!newRows.find(it => it.id === row.id)) {
           newRows.push(row);
         }
       });
       setSelectedRows(newRows);
-    }else{
+    } else {
       setSelectedRows([]);
     }
   };
@@ -73,11 +71,11 @@ const ServicePicker = props => {
   };
   const getCheckboxProps = useCallback((record) => {
     return {
-      disabled: props.disabledKeys?.includes(record._id),
+      disabled: props.disabledKeys?.includes(record.id),
     };
   }, [props.disabledKeys]);
 
-  const modalProps = props.single?{footer:false}:null;
+  const modalProps = props.single ? { footer: false } : null;
 
 
   return <Modal width={800}
@@ -97,19 +95,19 @@ const ServicePicker = props => {
         getCheckboxProps,
       }}
       tableAlertRender={false}
-      rowKey='_id'
+      rowKey='id'
       columns={[
         ...columns,
-        props.single && {
+         {
           dataIndex: 'option',
           valueType: 'option',
-          render: (_, record) => [<Button type={'link'} onClick={()=>props.onChange(record)}> 选择</Button>],
+          render: (_, record) => [props.single &&<Button type={'link'} onClick={() => props.onChange(record)}> 选择</Button>],
         },
       ]}
       pagination={{ pageSize: 20 }}
       search={{
         collapseRender: false,
-        collapsed: false,
+        defaultCollapsed: false,
       }}
       size={'small'}
     />

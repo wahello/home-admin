@@ -8,7 +8,7 @@ import ServiceTagApi from '@/services/shop/service-tag';
 const ServiceTagForm = ({ id, visible, onVisibleChange, onFinish }) => {
   const [form] = Form.useForm();
   const { data, loading, error } = useRequest(() => {
-    return id ? ServiceTagApi.get({ id }) : Promise.resolve();
+    return id ? ServiceTagApi.get(id) : Promise.resolve();
   }, {
     refreshDeps: [id],
   });
@@ -67,10 +67,8 @@ ServiceTagForm.propTypes =
   {
     id: PropTypes.string,
     visible: PropTypes.bool.isRequired,
-    onFinish:
-    PropTypes.func.isRequired,
+    onFinish: PropTypes.func.isRequired,
     onVisibleChange: PropTypes.func.isRequired,
-  }
-;
+  };
 
 export default ServiceTagForm;

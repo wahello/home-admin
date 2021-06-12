@@ -64,7 +64,10 @@ export default [{
   setting: <CubeSetting />,
   icon: <PictureOutlined />,
   defaultSetting: {
-    ...paddings,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
     pics: [{
       pic: null,
       page: null,
@@ -94,6 +97,9 @@ export default [{
     autoNum: 10,
     type: 1,
     serviceIds: [],
+    themeColor:'rgba(81,188,129,1)',
+    btnColor:'rgba(255,255,255,1)',
+    btnText: '立即预约',
     ...paddings,
   },
 }, {
@@ -112,7 +118,7 @@ export default [{
   },
 }, {
   name: '辅助空白',
-  key: 'sn-blank',
+  key: 'sn-white',
   category: 'help',
   component: <White />,
   setting: <WhiteSetting />,
@@ -124,7 +130,7 @@ export default [{
 },
   {
     name: '辅助线',
-    key: 'sn-blank-line',
+    key: 'sn-white-line',
     category: 'help',
     component: <WhiteLine />,
     setting: <WhiteLineSetting />,

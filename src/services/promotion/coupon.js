@@ -2,22 +2,31 @@ import { request } from 'umi';
 
 const CouponApi = {
   add: async (data) => {
-    return request('admin/promotion/coupon/sys/add', { data });
+    return request('/api/coupon', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/promotion/coupon/sys/update', { data });
+    return request('/api/coupon', {
+      method: 'POST',
+      data,
+    });
   },
   page: async (data) => {
-    return request('admin/promotion/coupon/sys/page', { data });
+    return request('/api/coupon/page', {
+      method: 'POST',
+      data,
+    });
   },
   list: async () => {
-    return request('admin/promotion/coupon/sys/list');
+    return request('/api/coupon/list');
   },
-  get: async (data) => {
-    return request('admin/promotion/coupon/sys/get', { data });
+  get: async (id) => {
+    return request(`/api/coupon/${id}`);
   },
-  remove: async (data) => {
-    return request('admin/promotion/coupon/sys/remove', { data });
+  remove: async (id) => {
+    return request(`/api/coupon/${id}`, { method: 'DELETE' });
   },
   copy: async (data) => {
     return request('admin/promotion/coupon/sys/copy', { data });

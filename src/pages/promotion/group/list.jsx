@@ -32,9 +32,9 @@ const expandedRowRender = row => {
                   },
                 },
                 { title: '价格', dataIndex: 'price', valueType: 'money' },
-                { title: '团购价格', dataIndex: 'group_price', valueType: 'money' },
+                { title: '团购价格', dataIndex: 'groupPrice', valueType: 'money' },
                 { title: '单位', dataIndex: 'unit' },
-                { title: '起售数量', dataIndex: 'min_num' },
+                { title: '起售数量', dataIndex: 'minNum' },
 
               ]}
               headerTitle={false}
@@ -53,7 +53,7 @@ const pageRequest = async (params) => {
 
   const { data } = res;
   const newData = data.map(group => {
-    if (!group.service._id) {
+    if (!group.service.id) {
       return {
         ...group,
         service: {
@@ -94,7 +94,7 @@ const GroupList = () => {
       centered: true,
       content: '确定要删除拼团商品吗？\n删除拼团商品后将无法恢复，请谨慎操作！',
       onOk: async () => {
-        await GroupApi.remove({ id });
+        await GroupApi.remove(id);
         message.success('删除成功');
         groupRef?.current?.reload();
       },
@@ -103,7 +103,7 @@ const GroupList = () => {
   const changeState = async (id, enable) => {
     const hide = message.loading('变更状态中');
     try {
-      await GroupApi.changeState({ id, enable });
+      await GroupApi.changeState({id, enable});
       message.success('变更状态成功');
       groupRef?.current?.reload();
     } catch (e) {
@@ -122,55 +122,55 @@ const GroupList = () => {
       title: '拼团商品',
       dataIndex: 'service',
       render: (service) => {
-        return <Space><Image src={service.main_pic} width={50} height={50} /><span>{service.name}</span></Space>;
+        return <Space><Image src={service.mainPic} width={50} height={50} /><span>{service.name}</span></Space>;
       },
       width: 200,
     },
     {
       title: '活动时间',
-      dataIndex: 'date_range',
+      dataIndex: 'startTime',
       hideInSearch: true,
-      render: v => {
-        return `${moment(v[0]).format('YYYY-MM-DD')} ~ ${moment(v[1]).format('YYYY-MM-DD')}`;
+      render: (_, { startTime, endTime }) => {
+        return `${moment(startTime).format('YYYY-MM-DD')} ~ ${moment(endTime).format('YYYY-MM-DD')}`;
       },
       width: 200,
     },
     {
       title: '成团人数',
-      dataIndex: 'join_min',
+      dataIndex: 'joinMin',
       hideInSearch: true,
     },
     {
       title: '拼团有效期',
-      dataIndex: 'join_hours',
+      dataIndex: 'joinHours',
       hideInSearch: true,
     },
     {
       title: '开团数',
-      dataIndex: 'group_num',
+      dataIndex: 'groupNum',
       hideInSearch: true,
     },
     {
       title: '参与人数',
-      dataIndex: 'join_num',
+      dataIndex: 'joinNum',
       hideInSearch: true,
     },
     {
       title: '成团数',
-      dataIndex: 'success_num',
+      dataIndex: 'successNum',
       hideInSearch: true,
     },
 
     {
       title: '虚拟成团',
-      dataIndex: 'allow_virtual',
+      dataIndex: 'allowVirtual',
       hideInSearch: true,
       render: it => it ? '开启' : '关闭',
     },
     {
       title: '状态',
       dataIndex: 'enable',
-      valueType: 'radioButton',
+      valueType: 'radio',
       fieldProps: {
         buttonStyle: 'solid',
       },
@@ -181,17 +181,18 @@ const GroupList = () => {
     },
     {
       title: '创建时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       hideInSearch: true,
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, { _id, enable }) => (<Space>
-        <Button type={'link'} onClick={() => history.push(`./edit?id=${_id}`)}>修改</Button>
-        <Button type={'link'} onClick={() => changeState(_id, !enable)}>{enable ? '关闭' : '开启'}</Button>
-        <Button type={'link'} danger onClick={() => removeRecord(_id)}>删除</Button>
+      render: (_, { id, enable }) => (<Space>
+        <Button type={'link'} onClick={() => history.push(`./edit?id=${id}`)}>修改</Button>
+        <Button type={'link'} onClick={() => changeState(id, !enable)}>{enable ? '关闭' : '开启'}</Button>
+        <Button type={'link'} danger onClick={() => removeRecord(id)}>删除</Button>
       </Space>),
     }];
   return <PageContainer>
@@ -208,7 +209,7 @@ const GroupList = () => {
             <PlusOutlined /> 新建
           </Button>,
         ]}
-          rowKey='_id'
+          rowKey='id'
           expandable={{
             expandedRowRender,
           }}

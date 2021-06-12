@@ -27,7 +27,7 @@ const MemberManage = () => {
     },
     {
       dataIndex: 'platform',
-      title: '注册平台',
+      title: '用户来源',
       render: it => {
         const platform = Enums.platform[it];
         return platform ? <Space size={'small'}>
@@ -46,14 +46,21 @@ const MemberManage = () => {
       title: '积分',
     },
     {
-      dataIndex: 'register_date',
-      title: '注册时间',
-      valueType: 'dateTime',
-      hideInSearch: true,
+      dataIndex: 'couponNum',
+      title: '优惠券',
     },
     {
-      dataIndex: 'last_login_date',
-      title: '最后登录时间',
+      dataIndex: 'orderNum',
+      title: '订单数',
+    },
+    {
+      dataIndex: 'paidFee',
+      title: '消费金额',
+      valueType: 'money'
+    },
+    {
+      dataIndex: 'createTime',
+      title: '注册时间',
       valueType: 'dateTime',
       hideInSearch: true,
     },
@@ -61,9 +68,9 @@ const MemberManage = () => {
       dataIndex: 'option',
       title: '操作',
       valueType: 'option',
-      render: (_, { _id }) => {
+      render: (_, { id }) => {
         return <Space>
-          <Button type={'link'} onClick={() => history.push(`/member/detail?id=${_id}`)}>详情</Button>
+          <Button type={'link'} onClick={() => history.push(`/member/detail?id=${id}`)}>详情</Button>
         </Space>;
       },
     },
@@ -74,7 +81,7 @@ const MemberManage = () => {
       <ProTable
         size={'small'}
         actionRef={tableRef} request={MemberApi.page}
-        rowKey='_id'
+        rowKey='id'
         columns={columns}
       />
     </PageContainer>

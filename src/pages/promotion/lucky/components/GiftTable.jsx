@@ -33,6 +33,12 @@ const GiftTable = props => {
         ...value,
       }]);
     }
+    setGift(null)
+  };
+
+  const calcPercent = weight => {
+    const allWeight = gifts.reduce((a, b) => a + b.weight, 0);
+    return `${(weight / allWeight * 100).toFixed(2)}%`;
   };
 
   const giftColumns = [
@@ -55,8 +61,17 @@ const GiftTable = props => {
       },
     },
     {
+      title: '提示',
+      dataIndex: 'tip',
+    },
+    {
       title: '权重',
       dataIndex: 'weight',
+    },
+    {
+      title: '奖品概率',
+      dataIndex: 'percent',
+      render: (_, { weight }) => calcPercent(weight),
     },
     {
       title: '操作',
@@ -64,7 +79,7 @@ const GiftTable = props => {
       render: (_, record) => {
         return <Space size={'small'}>
           <Button type={'link'} onClick={() => editGift(record)}>修改</Button>
-          <Button type={'link'} onClick={() => removeGift(record.id)}>删除</Button>
+          {record.id !== 1 && <Button type={'link'} onClick={() => removeGift(record.id)}>删除</Button>}
         </Space>;
       },
     },

@@ -6,43 +6,61 @@ const MemberApi = {
   },
 
   page: async (data) => {
-    return request('admin/member/sys/page',{data});
+    return request('/api/member/page', {
+      method: 'POST',
+      data,
+    });
   },
-  get: async (data) => {
-    return request('admin/member/sys/get',{data});
+  get: async (id) => {
+    return request(`/api/member/${id}`);
   },
   update: async (data) => {
-    return request('admin/member/sys/update', { data });
-  },
-  pageCoupon: async (data) => {
-    return request('admin/member/sys/pageCoupon', {
-      data
+    return request(`/api/member`, {
+      method: 'POST',
+      data,
     });
   },
-  pageAccount: async (data) => {
-    return request('admin/member/sys/pageAccount', {
-      data
+  pageCoupon: async (id, data) => {
+    return request(`/api/member/${id}/pageCoupon`, {
+      method: 'POST',
+      data,
     });
   },
-  pageAddress: async (data) => {
-    return request('admin/member/sys/pageAddress', {
-      data
+  pageAccount: async (id, data) => {
+    return request(`/api/member/${id}/pageAccount`, {
+      method: 'POST',
+      data,
     });
   },
-  sendCoupon: async (data) => {
-    return request('admin/member/sys/sendCoupon', {
-      data
+  pageOrder: async (id, data) => {
+    return request(`/api/member/${id}/pageOrder`, {
+      method: 'POST',
+      data,
     });
   },
-  updateUserAddress: async (data) => {
-    return request('admin/member/sys/updateUserAddress', {
-      data
+  pageAddress: async (id, data) => {
+    return request(`/api/member/${id}/pageAddress`, {
+      method: 'POST',
+      data,
     });
   },
-  adjustAccount: async (data) => {
-    return request('admin/member/sys/adjustAccount', {
-      data
+  sendCoupon: async (id, data) => {
+    return request(`/api/member/${id}/sendCoupon`, {
+      method: 'PUT',
+      data,
     });
-  }
+  },
+  updateAddress: async (data) => {
+    return request(`/api/member/updateAddress`, {
+      method: 'POST',
+      data,
+    });
+  },
+  adjustAccount: async (id, data) => {
+    return request(`/api/member/${id}/adjustAccount`, {
+      method: 'POST',
+      data,
+    });
+  },
 };
 export default MemberApi;

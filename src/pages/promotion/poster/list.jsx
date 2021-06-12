@@ -16,7 +16,7 @@ const PosterList = props => {
   const [poster, setPoster] = useState();
 
   const removeRecord = async id => {
-    await PosterApi.remove({ id });
+    await PosterApi.remove(id);
     message.success('删除成功');
     configTabRef?.current?.reload();
   };
@@ -44,7 +44,7 @@ const PosterList = props => {
     },
     {
       title: '二维码颜色',
-      dataIndex: 'line_color',
+      dataIndex: 'lineColor',
       align: 'center',
       render: (it, { auto_color }) => {
         return auto_color ? '自动识别' : <Tag color={it} style={{ width: 50, height: 20 }} />;
@@ -52,13 +52,14 @@ const PosterList = props => {
     },
     {
       title: '是否透明',
-      dataIndex: 'is_hyaline',
+      dataIndex: 'isHyaline',
       align: 'center',
       render: it => it ? '是' : '否',
     },
     {
       title: '创建时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       align: 'center',
       hideInSearch: true,
     },
@@ -68,12 +69,12 @@ const PosterList = props => {
       valueType: 'option',
       align: 'center',
       render: (_, record) => (<Space>
-        <Button type={'link'} onClick={() => history.push(`./edit?id=${record._id}`)}>修改</Button>
+        <Button type={'link'} onClick={() => history.push(`./edit?id=${record.id}`)}>修改</Button>
         <Button type={'link'} onClick={() => {
           setPoster(record);
           toggleGenVisible.setTrue();
         }}>生成海报</Button>
-        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(record._id)}
+        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(record.id)}
                     okButtonProps={{ type: 'primary', danger: true }}>
           <Button type={'link'} danger>删除</Button>
         </Popconfirm>
@@ -94,7 +95,7 @@ const PosterList = props => {
         <PlusOutlined /> 新建
       </Button>,
     ]}
-      rowKey='_id'
+      rowKey='id'
       columns={columns}
     />
     <GenForm onVisibleChange={toggleGenVisible.toggle} visible={genVisible} poster={poster} />

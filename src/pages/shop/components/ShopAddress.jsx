@@ -88,13 +88,16 @@ const ShopAddress = props => {
 
 
   return (
-    <Space direction={'vertical'} size={'small'}>
-      <Cascader value={postion?.area} style={{ width: 300 }} options={areas} onChange={onAreaChange}
-                allowClear={false} />
-      <Input.Search value={postion?.address} onChange={onAddressChange} style={{ width: 500 }} enterButton={'查找地址'}
-                    onSearch={searchAddress} />
-      <div style={{ width: 500, height: 300 }}>
-        <MyMap zoom={12} events={{ created: createdMap }} center={{ longitude: postion?.lng || 0, latitude: postion?.lat || 0 }}>
+    <Space direction={'vertical'} >
+      <Space size={'small'}>
+        <Cascader value={postion?.area} style={{ width: 300 }} options={areas} onChange={onAreaChange}
+                  allowClear={false} />
+        <Input.Search value={postion?.address} onChange={onAddressChange} style={{ width: 500 }} enterButton={'查找地址'}
+                      onSearch={searchAddress} placeholder={'详细地址'} />
+      </Space>
+      <div style={{ width: 800, height: 400 }}>
+        <MyMap zoom={12} events={{ created: createdMap }}
+               center={{ longitude: postion?.lng || 0, latitude: postion?.lat || 0 }}>
           <MouseTool events={toolEvents} />
           <Marker events={{ created: setMarker }}
                   position={{ longitude: postion?.lng || 0, latitude: postion?.lat || 0 }} />

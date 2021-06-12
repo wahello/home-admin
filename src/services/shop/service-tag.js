@@ -2,19 +2,27 @@ import { request } from 'umi';
 
 const ServiceTagApi = {
   add: async (data) => {
-    return request('admin/service-tag/sys/add', { data });
+    return request('/api/item/tag', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/service-tag/sys/update', { data });
+    return request('/api/item/tag', {
+      method: 'POST',
+      data,
+    });
   },
   list: async () => {
-    return request('admin/service-tag/sys/list');
+    return request('/api/item/tag/list');
   },
-  get: async (data) => {
-    return request('admin/service-tag/sys/get', { data });
+  get: async (id) => {
+    return request(`/api/item/tag/${id}`);
   },
-  remove: async (data) => {
-    return request('admin/service-tag/sys/remove', { data });
+  remove: async (id) => {
+    return request(`/api/item/tag/${id}`, {
+      method: 'DELETE',
+    });
   },
 };
 export default ServiceTagApi;

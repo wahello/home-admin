@@ -16,16 +16,14 @@ import ProForm from '@ant-design/pro-form';
 import defaultPageSetting from '@/pages/app/diy/defaultPageSetting';
 
 
-
-
 const Diy = (props) => {
 
   const { id } = props.location.query;
   const [form] = Form.useForm();
   const [currentItem, setCurrentItem] = useState(null);
 
-  const getRequest = useRequest(id ? () => PageApi.get({ id }) : PageApi.getHome);
-  const saveRequest = useRequest(id ? (data) => PageApi.update({ id,...data }) : PageApi.updateHome, { manual: true });
+  const getRequest = useRequest(id ? () => PageApi.get(id) : PageApi.getHome);
+  const saveRequest = useRequest(id ? (data) => PageApi.update({ id, ...data }) : PageApi.updateHome, { manual: true });
 
   const [mpSetting, setMpSetting] = useState({
     page: defaultPageSetting,
@@ -93,10 +91,7 @@ const Diy = (props) => {
   }, [currentItem]);
 
   return <PageContainer title={false} breadcrumb={false}
-                        footer={<div style={{ textAlign: 'center' }}><Space size={'large'}><Button type={'primary'}
-                                                                                                   onClick={handleSubmit}
-                                                                                                   loading={saveRequest.loading}>保存</Button><Button
-                          type={'primary'}>预览</Button></Space></div>}>
+                        >
     <DiyContext.Provider value={{ currentItem, setCurrentItem, mpSetting, setMpSetting }}>
       <DndProvider backend={HTML5Backend}>
         <ProCard ghost gutter={8} key={'container'}>
@@ -109,7 +104,12 @@ const Diy = (props) => {
                 <MobilePreview />
               </Spin>
             </div>
-            <Button onClick={setPage} style={{ position: 'absolute', top: 0, right: 10 }}>页面设置</Button>
+            <Space style={{ position: 'absolute', top: 0, right: 10 }}>
+              <Button onClick={setPage} >页面设置</Button>
+              <Button type={'primary'}
+                      onClick={handleSubmit}
+                      loading={saveRequest.loading}>保存</Button>
+            </Space>
           </ProCard>
 
           <ProCard key={'setting'} title={currentComponent?.name || '页面设置'} colSpan='450px'

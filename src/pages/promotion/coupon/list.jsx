@@ -16,7 +16,7 @@ const CouponList = () => {
   const removeRecord = async id => {
     const hide = message.loading('正在删除');
     try {
-      await CouponApi.remove({ id });
+      await CouponApi.remove(id);
       message.success('删除成功');
       tableRef?.current?.reload();
     } catch (e) {
@@ -33,29 +33,29 @@ const CouponList = () => {
     },
     {
       title: '优惠券类型',
-      dataIndex: ['discount', 'type'],
+      dataIndex: 'discountType',
       valueType: 'radio',
       valueEnum: Enums.discountType,
     },
     {
       title: '优惠金额/折扣',
-      dataIndex: ['discount', 'deduction'],
+      dataIndex: 'deduction',
       render: (_, record) => {
-        return record.discount.type === Enums.discountType.DEDUCTION.value ? `￥${record.discount.deduction}` : `${record.discount.rebate}折`;
+        return record.discountType === Enums.discountType.DEDUCTION.value ? `￥${record.deduction}` : `${record.rebate}折`;
       },
       hideInSearch: true,
     },
     {
       title: '使用门槛',
-      dataIndex: ['discount', 'use_min'],
+      dataIndex: 'useMin',
       valueType: 'money',
       hideInSearch: true,
     },
     {
       title: '有效期限',
-      dataIndex: 'expire',
-      render: it => {
-        return it.type === Enums.expireType.DATE.value ? `${moment(it.expire_date).format('YYYY-MM-DD')}前有效` : `领取后${it.expire_day}天有效`;
+      dataIndex: 'expireType',
+      render: (it,{expireDate,expireDay}) => {
+        return it === Enums.expireType.DATE.value ? `${moment(expireDate).format('YYYY-MM-DD')}前有效` : `领取后${expireDay}天有效`;
       },
       hideInSearch: true,
     },
@@ -67,29 +67,39 @@ const CouponList = () => {
     },
     {
       title: '已发放数量',
-      dataIndex: 'receive_count',
+      dataIndex: 'receiveCount',
       hideInSearch: true,
     },
     {
       title: '是否公开',
-      dataIndex: 'is_public',
+      dataIndex: 'isPublic',
       render: it => <Switch checked={it} />,
-      renderFormItem: (_, { fieldProps  }) => {
-        return <Switch style={{width:'unset'}} {...fieldProps} />;
+      valueType: 'radio',
+      valueEnum: {
+        true:{
+          text: '是',
+          value: true,
+        },
+        false:{
+          text: '否',
+          value: false,
+        }
+
       }
     },
     {
       title: '创建时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       hideInSearch: true,
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, { _id }) => (<Space>
-        <Button type={'link'} onClick={() => history.push(`./edit?id=${_id}`)}>修改</Button>
-        <Popconfirm title={<span>确认删除?<br />删除不会影响用户已领取过的券</span>} onConfirm={() => removeRecord(_id)}
+      render: (_, { id }) => (<Space>
+        <Button type={'link'} onClick={() => history.push(`./edit?id=${id}`)}>修改</Button>
+        <Popconfirm title={<span>确认删除?<br />删除不会影响用户已领取过的券</span>} onConfirm={() => removeRecord(id)}
                     okButtonProps={{ type: 'primary', danger: true }}>
           <Button type={'link'} danger>删除</Button>
         </Popconfirm>
@@ -106,7 +116,7 @@ const CouponList = () => {
         <PlusOutlined /> 新建
       </Button>,
     ]}
-      rowKey='_id'
+      rowKey='id'
       columns={columns}
     />
   </PageContainer>;

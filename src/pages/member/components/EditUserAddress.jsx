@@ -15,7 +15,11 @@ const EditUserAddress = ({ address, visible, onVisibleChange, onFinish }) => {
     }
   }, [address]);
   const onSubmit = async (values) => {
-    await MemberApi.updateUserAddress({ addressId: address._id,userId:address.userId, address: values });
+    await MemberApi.updateAddress({
+      id:address.id,
+      memberId:address.memberId,
+      ...values,
+    });
     return onFinish();
   };
   return (
@@ -33,7 +37,7 @@ const EditUserAddress = ({ address, visible, onVisibleChange, onFinish }) => {
         name='mobile'
         label='联系方式'
         fieldProps={{
-          maxLength:11
+          maxLength: 11,
         }}
         placeholder='请输入联系方式'
         rules={[{ required: true, message: '请输入联系方式' }]}
@@ -48,7 +52,7 @@ const EditUserAddress = ({ address, visible, onVisibleChange, onFinish }) => {
       />
       <ProFormSwitch
         width={'md'}
-        name='default_flag'
+        name='defaultFlag'
         label='是否默认'
       />
 
@@ -57,7 +61,7 @@ const EditUserAddress = ({ address, visible, onVisibleChange, onFinish }) => {
 };
 
 EditUserAddress.propTypes = {
-  userId: PropTypes.string,
+  address: PropTypes.object,
   visible: PropTypes.bool.isRequired,
   onFinish: PropTypes.func.isRequired,
   onVisibleChange: PropTypes.func.isRequired,

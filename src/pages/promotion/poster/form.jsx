@@ -26,7 +26,7 @@ const PosterForm = props => {
 
   useEffect(() => {
     if (id) {
-      getRequest.run({ id });
+      getRequest.run(id);
     }
   }, [id]);
   useEffect(() => {
@@ -38,9 +38,12 @@ const PosterForm = props => {
   const onFinish = async poster => {
     try {
       if (id) {
-        await PosterApi.update({ id, poster });
+        await PosterApi.update({
+          id,
+          ...poster,
+        });
       } else {
-        await PosterApi.add({ poster });
+        await PosterApi.add(poster);
       }
       message.success('保存成功');
       history.goBack();
@@ -102,20 +105,20 @@ const PosterForm = props => {
                       image={pic} /></ProForm.Item> : null;
                 }}
               </ProFormDependency>
-              <ProFormSwitch name={'auto_color'} initialValue={true} label={'二维码颜色'}
+              <ProFormSwitch name={'autoColor'} initialValue={true} label={'二维码颜色'}
                              extra={'是否自动配置二维码线条颜色，如果手动指定后颜色依然是黑色，则说明该颜色下二维码不易识别'} fieldProps={{
                 checkedChildren: '自动识别',
                 unCheckedChildren: '手动指定',
               }} />
-              <ProFormDependency name={['auto_color']}>
-                {({ auto_color }) => {
-                  return auto_color ?
-                    null : <ProForm.Item label={'线条颜色'} name={'line_color'} initialValue={'rgba(1,1,1,1)'}>
+              <ProFormDependency name={['autoColor']}>
+                {({ autoColor }) => {
+                  return autoColor ?
+                    null : <ProForm.Item label={'线条颜色'} name={'lineColor'} initialValue={'rgba(1,1,1,1)'}>
                       <ColorPicker allowTrans={false} />
                     </ProForm.Item>;
                 }}
               </ProFormDependency>
-              <ProFormSwitch name={'is_hyaline'}  label={'是否透明底色'}
+              <ProFormSwitch name={'isHyaline'}  label={'是否透明底色'}
                              extra={'开启后，生成的小程序二维码背景为透明'} />
             </ProForm>}
         </ProCard>

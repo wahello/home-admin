@@ -7,18 +7,11 @@ import WithdrawApi from '@/services/finance/withdraw';
 const CheckForm = ({ record, visible, onVisibleChange, onFinish }) => {
 
   const [form] = Form.useForm();
-  useEffect(() => {
-    if (record) {
-      form.setFieldsValue(record);
-    }
-  }, [record]);
+
 
 
   const onSubmit = async values => {
-    await WithdrawApi.trans({
-      id: record._id,
-      ...values,
-    });
+    await WithdrawApi.trans(record.id,values);
     return onFinish();
   };
 
@@ -33,9 +26,9 @@ const CheckForm = ({ record, visible, onVisibleChange, onFinish }) => {
         <br/>
       </ProForm.Item>
       <ProFormRadio.Group
-        name='trans_auto'
-        initialValue={true}
+        name='transAuto'
         label='转账方式'
+        initialValue={true}
         options={[{ label: '自动转账', value: true }, { label: '手动转账', value: false }]}
       />
     </ModalForm>

@@ -45,15 +45,15 @@
       align-items: center;
 
       .price {
-        font-size: 32px;
+        font-size: 38px;
         color: #FF4544;
         font-weight: bold;
         margin-right: 10px;
       }
 
       .linePrice {
-        margin-left: 20px;
-        font-size: 20px;
+        margin-left: 10px;
+        font-size: 24px;
         color: #909399;
         text-decoration: line-through;
       }
@@ -69,9 +69,9 @@
 
         .tag {
           font-size: 24px;
-          color: #51bc81;
           border-radius: 5px;
-          border: 2px solid #51bc81;
+          border-width: 2px;
+          border-style: solid;
           padding: 2px 10px;
           margin-right: 10px;
         }
@@ -79,8 +79,6 @@
 
       .btn {
         margin-left: auto;
-        background: #51bc81;
-        color: #FFFFFF;
         padding: 5px 30px;
         display: flex;
         align-items: center;
@@ -101,21 +99,36 @@
   padding: 20px;
 
   .serviceImg {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
     object-fit: cover;
   }
 
 
   .serviceBody {
+    width: calc(100% - 240px);
     margin-left: 20px;
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
 
     .serviceName {
       font-size: 28px;
-      height: 72px;
+      line-height: 36px;
+    }
+    .tags {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      .tag {
+        font-size: 20px;
+        border-radius: 5px;
+        border-width: 2px;
+        border-style: solid;
+        padding: 2px 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
     }
 
     .footer {
@@ -139,6 +152,15 @@
 
       .sales {
         color: #999999;
+        font-size: 24px;
+      }
+      .btn {
+        margin-top: 10px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 30px;
         font-size: 24px;
       }
     }
@@ -177,41 +199,59 @@
     .serviceName {
       font-size: 28px;
       height: 72px;
+      line-height: 36px;
+      overflow: hidden;
+      word-break: break-all;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .tags {
       display: flex;
       align-items: center;
-
+      margin-top: 10px;
       .tag {
         font-size: 20px;
-        color: #51bc81;
         border-radius: 5px;
-        border: 2px solid #51bc81;
+        border-width: 2px;
+        border-style: solid;
         padding: 0 2px;
         margin-right: 10px;
       }
     }
-
+  }
+  .footer{
+    padding:10px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
     .priceWrapper {
-      margin-top: auto;
       display: flex;
       flex-direction: column;
 
       .price {
-        margin-top: 10px;
         font-size: 32px;
         color: #FF4544;
         font-weight: bold;
-        margin-right: 10px;
       }
 
       .linePrice {
-
         font-size: 20px;
         color: #909399;
         text-decoration: line-through;
       }
+    }
+    .btn {
+      margin-left: auto;
+      padding: 5px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      font-size: 24px;
     }
   }
 }

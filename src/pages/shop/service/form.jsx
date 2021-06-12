@@ -1,24 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProForm, {
-  ProFormCheckbox,
   ProFormDependency,
   ProFormDigit,
   ProFormRadio,
   ProFormSelect,
   ProFormText,
+  ProFormTimePicker,
 } from '@ant-design/pro-form';
 import { history, useRequest } from 'umi';
 import ProCard from '@ant-design/pro-card';
 import ServiceCategoryApi from '@/services/shop/service-category';
 import ServiceTagApi from '@/services/shop/service-tag';
-import { Button, Form, Input, message, Result, Select, Spin, Tag } from 'antd';
+import { Button, Form, message, Result, Spin } from 'antd';
 import Enums from '@/utils/enums';
 import MaterialPicker from '@/components/MaterialPicker';
 import { EditableProTable } from '@ant-design/pro-table';
 import MyEditor from '@/components/MyEditor';
 import ServiceApi from '@/services/shop/service';
 import uuid from 'uuid';
+import BraftEditor from 'braft-editor';
+import moment from 'moment';
+import { useBoolean } from 'ahooks';
 
 
 const skuColumns = [
@@ -35,7 +38,7 @@ const skuColumns = [
   },
   {
     title: '划线价格',
-    dataIndex: 'line_price',
+    dataIndex: 'linePrice',
     valueType: 'money',
     width: '15%',
   },
@@ -46,7 +49,7 @@ const skuColumns = [
   },
   {
     title: '起售数量',
-    dataIndex: 'min_num',
+    dataIndex: 'minNum',
     valueType: 'digit',
     fieldProps: { precision: 0, min: 1 },
     width: '10%',
@@ -70,31 +73,31 @@ const ServiceForm = props => {
   const [id] = useState(props.location.query.id);
   const [editableKeys, setEditableRowKeys] = useState([]);
   const getRequest = useRequest(ServiceApi.get, { manual: true });
+  const [submitLoading, toggleSubmitLoading] = useBoolean(false);
 
   const addSku = () => {
     skuRef.current?.addEditRecord?.({
       id: uuid().replaceAll('-', ''),
-      min_num: 1,
+      minNum: 1,
     }, { newRecordType: 'dataSource' });
   };
 
   useEffect(() => {
     if (id) {
-      getRequest.run({ id });
+      getRequest.run(id);
     } else {
       const sku = {
         id: uuid().replaceAll('-', ''),
-        min_num: 1,
+        minNum: 1,
       };
       baseForm.setFieldsValue({
-        pay: {
-          type: Enums.payType.BEFORE.value,
-        },
+        payType: Enums.payType.BEFORE.value,
         skus: [sku],
       });
       setEditableRowKeys([sku.id]);
     }
   }, [id]);
+
   useEffect(() => {
     const service = getRequest.data;
     if (service) {
@@ -102,12 +105,13 @@ const ServiceForm = props => {
       const formData = {
         ...service,
         skus,
+        pics: service.pics?.split(','),
+        content: BraftEditor.createEditorState(service.content),
       };
       baseForm.setFieldsValue(formData);
       setEditableRowKeys(skus.map(it => it.id));
     }
   }, [getRequest.data]);
-
 
   const submitService = async values => {
     if (values.skus) {
@@ -121,10 +125,11 @@ const ServiceForm = props => {
       }
     }
     try {
+      toggleSubmitLoading.setTrue();
       const submitValues = {
         ...values,
-        main_pic: values.main_pic,
-        service_content: values.service_content.toHTML(),
+        content: values.content?.toHTML(),
+        pics: values.pics?.join(','),
       };
       if (id) {
         await ServiceApi.update({ ...submitValues, id });
@@ -136,6 +141,8 @@ const ServiceForm = props => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
+    } finally {
+      toggleSubmitLoading.setFalse();
     }
   };
 
@@ -151,15 +158,6 @@ const ServiceForm = props => {
                   onFinish={submitService}
                   validateMessages={{
                     required: '此项为必填项',
-                  }}
-                  submitter={{
-                    searchConfig: {
-                      submitText: '保存',
-                    },
-                    render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
-                    submitButtonProps: {
-                      size: 'large',
-                    },
                   }}
                   scrollToFirstError
             >
@@ -185,27 +183,30 @@ const ServiceForm = props => {
                 placeholder=''
                 extra={'用于搜索引擎优化，可输入多个，回车分隔。例如北京上门保洁、北京冰箱清洗等'}
               />
-              <ProFormSelect name='category' label='服务分类' width='md' placeholder='请选择分类' rules={[{ required: true }]}
+              <ProFormSelect name='categoryId' label='服务分类' width='md' placeholder='请选择分类' rules={[{ required: true }]}
                              request={async () => {
                                const { data: categoryList } = await ServiceCategoryApi.list();
-                               return categoryList?.map(({ _id, name, children }) => ({
-                                 value: _id,
-                                 label: name,
-                                 children: children.map(it => ({ value: it._id, label: it.name })),
+                               return categoryList?.map((cat) => ({
+                                 value: cat.id,
+                                 label: cat.name,
+                                 children: cat.children.map(it => ({ value: it.id, label: it.name })),
                                  optionType: 'optGroup',
                                }));
                              }}
               />
-              <ProFormSelect name='tags' label='服务标签' mode={'multiple'} width={'md'}
+              <ProFormSelect name='tagIds' label='服务标签' mode={'multiple'} width={'md'}
                              request={async () => {
                                const { data: tagList } = await ServiceTagApi.list();
-                               return tagList?.map(({ _id, name }) => ({
-                                 value: _id,
-                                 label: name,
+                               return tagList?.map((tag) => ({
+                                 value: tag.id,
+                                 label: tag.name,
                                }));
                              }}
               />
-              <ProFormDigit name={'virtual_sales'} label={'虚拟销量'} min={0} initialValue={0} width={'xs'}
+              <ProFormTimePicker.RangePicker name='appointTimeRange' label='可预约时间段'
+                                             fieldProps={{ minuteStep: 30, format: 'HH:mm' }}
+                                             initialValue={[moment('2020-01-01 08:30'), moment('2020-01-01 18:00')]} />
+              <ProFormDigit name={'virtualSales'} label={'虚拟销量'} min={0} initialValue={0} width={'xs'}
                             fieldProps={{ precision: 0 }} />
               <ProForm.Item
                 label='服务规格'
@@ -223,7 +224,7 @@ const ServiceForm = props => {
                       creatorButtonText: '添加规格',
                       record: () => ({
                         id: uuid().replaceAll('-', ''),
-                        min_num: 1,
+                        minNum: 1,
                       }),
                     }}
                     editable={{
@@ -240,29 +241,31 @@ const ServiceForm = props => {
               </ProForm.Item>
 
               <ProFormRadio.Group
-                name={['pay', 'type']}
+                name={'payType'}
                 label='付款方式'
                 rules={[{ required: true }]}
                 options={Object.values(Enums.payType).map(({ text, value }) => ({ label: text, value }))}
               />
-              <ProFormDependency name={['pay', 'type']}>
-                {({ pay }) => pay?.type === Enums.payType.PART.value && <ProFormDigit
+              <ProFormDependency name={['payType']}>
+                {({ payType }) => payType === Enums.payType.PART.value && <ProFormDigit
                   width='sm'
-                  name={['pay', 'part']}
+                  name={'payPart'}
                   label={'预定金额'}
                   rules={[{ required: true }]}
                 />}
               </ProFormDependency>
-              <ProForm.Item name={'main_pic'} label={'主图'} rules={[{ required: true }]}>
+              <ProForm.Item name={'mainPic'} label={'主图'} rules={[{ required: true }]}>
                 <MaterialPicker />
               </ProForm.Item>
               <ProForm.Item name={'pics'} label={'轮播图'}>
                 <MaterialPicker mode={'multi'} />
               </ProForm.Item>
-              <Form.Item name={'service_content'} label={'服务详情'}>
+              <ProForm.Item name={'content'} label={'服务详情'}>
                 <MyEditor />
-              </Form.Item>
-              <Button htmlType={'submit'}>提交</Button>
+              </ProForm.Item>
+              <div style={{ textAlign: 'center' }}>
+                <Button htmlType={'submit'} type={'primary'} loading={submitLoading}>保存</Button>
+              </div>
             </Form>}
         </ProCard>
       </Spin>

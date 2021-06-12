@@ -57,19 +57,19 @@ const ServiceRow = props => {
   return (
     <Row gutter={16}>
       <Col span={8}>
-        <ProCard title={'商品访问排行'} loading={loading}>
+        <ProCard title={'服务浏览排行'} loading={loading}>
           <ProTable style={{height:300}} columns={visitColumn} dataSource={data?.visitData} search={false} toolBarRender={false}
                     pagination={false} />
         </ProCard>
       </Col>
       <Col span={8}>
-        <ProCard title={'商品订单排行'} loading={loading}>
+        <ProCard title={'服务订单排行'} loading={loading}>
           <ProTable style={{height:300}} columns={orderNumColumn} dataSource={data?.orderNumData} search={false} toolBarRender={false}
                     pagination={false} />
         </ProCard>
       </Col>
       <Col span={8}>
-        <ProCard  title={'商品金额排行'} loading={loading}>
+        <ProCard  title={'服务金额排行'} loading={loading}>
           <ProTable style={{height:300}}  columns={saleTotalColumn} dataSource={data?.saleTotalData} search={false} toolBarRender={false}
                     pagination={false} />
         </ProCard>

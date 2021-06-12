@@ -2,7 +2,8 @@ import { request } from 'umi';
 
 const LoginApi = {
   login: async (data) => {
-    return request('user/pub/login', {
+    return request('/api/login', {
+      method: 'POST',
       data,
     });
   },
@@ -23,7 +24,7 @@ const LoginApi = {
     });
   },
   currentUser: async (data) => {
-    return request('user/kh/getMyUserInfo', {
+    return request('/api/currentUser', {
       data,
     });
   },

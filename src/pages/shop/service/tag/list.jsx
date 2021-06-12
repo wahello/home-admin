@@ -25,7 +25,7 @@ const ServiceTagList = props => {
   const removeRecord = async id => {
     const hide = message.loading('正在删除');
     try {
-      await ServiceTagApi.remove({ id });
+      await ServiceTagApi.remove(id);
       message.success('删除成功');
       tableRef?.current?.reload();
     } catch (e) {
@@ -46,15 +46,16 @@ const ServiceTagList = props => {
     },
     {
       title: '创建时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, { _id }) => (<Space>
-        <Button type={'link'} onClick={() => editRecord(_id)}>修改</Button>
-        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(_id)}
+      render: (_, { id }) => (<Space>
+        <Button type={'link'} onClick={() => editRecord(id)}>修改</Button>
+        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(id)}
                     okButtonProps={{ danger: true, type: 'primary' }}>
           <Button type={'link'} size={'small'} danger>删除</Button>
         </Popconfirm>

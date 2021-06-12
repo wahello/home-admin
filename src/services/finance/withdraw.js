@@ -3,13 +3,22 @@ import { request } from 'umi';
 const WithdrawApi = {
 
   page: async (data) => {
-    return request('admin/withdraw/sys/page',{data});
+    return request('/api/withdraw/page', {
+      method: 'POST',
+      data,
+    });
   },
-  check: async (data) => {
-    return request('admin/withdraw/sys/check',{data});
+  check: async (id,data) => {
+    return request(`/api/withdraw/${id}/check`, {
+      method: 'POST',
+      data,
+    });
   },
-  trans: async (data) => {
-    return request('admin/withdraw/sys/trans',{data});
+  trans: async (id,data) => {
+    return request(`/api/withdraw/${id}/trans`, {
+      method: 'POST',
+      data,
+    });
   },
 };
 export default WithdrawApi;

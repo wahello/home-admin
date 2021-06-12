@@ -36,9 +36,9 @@ const todayRowFields = [{
   component: Area,
 }, {
   key: 'visit',
-  label: '浏览量',
+  label: '访问量',
   color: '#58AFFF',
-  tip: '',
+  tip: '今日打开应用用户量，30分钟内同一用户只统计一次',
   component: Column,
 }];
 const weeks = [

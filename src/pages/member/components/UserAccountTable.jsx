@@ -4,7 +4,7 @@ import Enums from '@/utils/enums';
 import ProTable from '@ant-design/pro-table';
 import MemberApi from '@/services/member';
 
-const UserAccountTable = React.forwardRef(({ userId },ref) => {
+const UserAccountTable = React.forwardRef(({ memberId },ref) => {
   const tableRef = useRef();
 
   useImperativeHandle(ref, () => ({
@@ -12,10 +12,7 @@ const UserAccountTable = React.forwardRef(({ userId },ref) => {
   }));
 
   const pageRequest = params => {
-    return MemberApi.pageAccount({
-      ...params,
-      userId,
-    });
+    return MemberApi.pageAccount(memberId,params);
   };
 
   const columns = [
@@ -41,8 +38,9 @@ const UserAccountTable = React.forwardRef(({ userId },ref) => {
     },
     {
       title: '发生时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
       hideInSearch: true,
+      valueType: 'dateTime',
       width: 150,
     },
   ];
@@ -50,7 +48,7 @@ const UserAccountTable = React.forwardRef(({ userId },ref) => {
   return <ProTable
     size={'small'}
     actionRef={tableRef} request={pageRequest} toolBarRender={() => []}
-    rowKey='_id'
+    rowKey='id'
     pagination={{ pageSize: 10 }}
     columns={columns}
   />;
@@ -59,7 +57,7 @@ const UserAccountTable = React.forwardRef(({ userId },ref) => {
 });
 
 UserAccountTable.propTypes = {
-  userId: PropTypes.string,
+  memberId: PropTypes.string,
 };
 
 export default UserAccountTable;

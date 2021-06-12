@@ -13,25 +13,29 @@ import ProCard from '@ant-design/pro-card';
 
 const expandedRowRender = row => {
   return <ProCard><ProTable size={'small'}
-    columns={[
-      {
-        title: '序号',
-        dataIndex: 'index',
-        valueType: 'indexBorder',
-        width: 50,
-      },
-      { title: '规格名称', dataIndex: 'name' },
-      { title: '价格', dataIndex: 'price', valueType: 'money' },
-      { title: '划线价格', dataIndex: 'line_price', valueType: 'money' },
-      { title: '单位', dataIndex: 'unit',  },
-      { title: '起售数量', dataIndex: 'min_num' },
-      { title: '图片', dataIndex: 'pic', render: it => <Image src={it || row.main_pic} width={50} height={50} /> },
-    ]}
-    headerTitle={false}
-    search={false}
-    options={false}
-    dataSource={row.skus}
-    pagination={false}
+                            columns={[
+                              {
+                                title: '序号',
+                                dataIndex: 'index',
+                                valueType: 'indexBorder',
+                                width: 50,
+                              },
+                              { title: '规格名称', dataIndex: 'name' },
+                              { title: '价格', dataIndex: 'price', valueType: 'money' },
+                              { title: '划线价格', dataIndex: 'linePrice', valueType: 'money' },
+                              { title: '单位', dataIndex: 'unit' },
+                              { title: '起售数量', dataIndex: 'minNum' },
+                              {
+                                title: '图片',
+                                dataIndex: 'pic',
+                                render: it => <Image src={it || row.main_pic} width={50} height={50} />,
+                              },
+                            ]}
+                            headerTitle={false}
+                            search={false}
+                            options={false}
+                            dataSource={row.skus}
+                            pagination={false}
   /></ProCard>;
 };
 
@@ -108,23 +112,24 @@ const ServiceList = props => {
       title: '服务名称',
       dataIndex: 'name',
       render: (text, record) => {
-        return <Space><Image src={record.main_pic} width={50} height={50} /><span>{text}</span></Space>;
+        return <Space><Image src={record.mainPic} width={50} height={50} /><span>{text}</span></Space>;
       },
       width: 200,
     },
     {
       title: '服务分类',
-      dataIndex: 'category',
-      render: text => {
-        return text.name;
+      dataIndex: 'categoryName',
+      valueType: 'select',
+      formItemProps: {
+        name: 'categoryId',
       },
       request: async () => {
         const { data: categoryList } = await ServiceCategoryApi.list();
-        return categoryList?.map(({ _id, name,children }) => ({
-          value: _id,
+        return categoryList?.map(({ id, name, children }) => ({
+          value: id,
           label: name,
-          children:children.map(it=>({value:it._id, label: it.name})),
-          optionType:'optGroup'
+          children: children.map(it => ({ value: it.id, label: it.name })),
+          optionType: 'optGroup',
         }));
       },
       width: 100,
@@ -132,29 +137,32 @@ const ServiceList = props => {
     {
       title: '标签',
       dataIndex: 'tags',
+      formItemProps: {
+        name: 'tagId',
+      },
       render: (text) => {
         return <Space>
-          {text?.map(({ _id, name, color }) => <Tag key={_id} color={color}>{name}</Tag>)}
+          {text.map(({ name }, idx) => <Tag key={idx}>{name}</Tag>)}
         </Space>;
       },
       request: async () => {
         const { data } = await ServiceTagApi.list();
-        return data?.map(({ _id, name }) => ({
-          value: _id,
+        return data?.map(({ id, name }) => ({
+          value: id,
           label: name,
         }));
       },
     },
     {
       title: '销量',
-      dataIndex: 'virtual_sales',
+      dataIndex: 'virtualSales',
       hideInSearch: true,
-      render: (virtual_sales,{ real_sales = 0  }) => {
+      render: (virtualSales, { realSales }) => {
         return <Tooltip title={<Space direction={'vertical'}>
-          <span>真实销量：{real_sales}</span>
-          <span>虚拟销量：{virtual_sales}</span>
+          <span>真实销量：{realSales}</span>
+          <span>虚拟销量：{virtualSales}</span>
         </Space>}>
-          <span>{real_sales + virtual_sales}</span>
+          <span>{virtualSales + realSales}</span>
         </Tooltip>;
       },
     },
@@ -166,13 +174,14 @@ const ServiceList = props => {
     },
     {
       title: '付款方式',
-      dataIndex: ['pay','type'],
+      dataIndex: 'payType',
       width: 100,
       valueEnum: Enums.payType,
     },
     {
       title: '创建时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       width: 150,
       hideInSearch: true,
     },
@@ -188,22 +197,22 @@ const ServiceList = props => {
       dataIndex: 'option',
       valueType: 'option',
       align: 'center',
-      render: (_, { _id, state }) => (<Space>
-        <Button type={'link'} onClick={() => history.push(`/shop/service/edit?id=${_id}`)}>修改</Button>
+      render: (_, { id, state }) => (<Space>
+        <Button type={'link'} onClick={() => history.push(`/shop/service/edit?id=${id}`)}>修改</Button>
         {state === Enums.serviceState.NOT_SALE.value ?
-          <Popconfirm title={'确认上架?'} onConfirm={() => changeState(_id, Enums.serviceState.IN_SALE.value)}>
+          <Popconfirm title={'确认上架?'} onConfirm={() => changeState(id, Enums.serviceState.IN_SALE.value)}>
             <Button type={'link'} size={'small'}>上架</Button>
           </Popconfirm> :
-          <Popconfirm title={'确认下架?'} onConfirm={() => changeState(_id, Enums.serviceState.NOT_SALE.value)}>
+          <Popconfirm title={'确认下架?'} onConfirm={() => changeState(id, Enums.serviceState.NOT_SALE.value)}>
             <Button type={'link'} size={'small'}>下架</Button>
           </Popconfirm>}
-        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(_id)}
+        <Popconfirm title={'确认删除?'} onConfirm={() => removeRecord(id)}
                     okButtonProps={{ type: 'primary', danger: true }}
                     disabled={state === Enums.serviceState.IN_SALE.value}>
           <Button disabled={state === Enums.serviceState.IN_SALE.value} type={'link'} size={'small'} danger>删除</Button>
         </Popconfirm>
         <Dropdown overlay={<Menu>
-          <Menu.Item onClick={() => copyService(_id)}>复制</Menu.Item>
+          <Menu.Item onClick={() => copyService(id)}>复制</Menu.Item>
           <Menu.Item>订单</Menu.Item>
           <Menu.Item>评论</Menu.Item>
         </Menu>}><Button type={'link'}>更多<DownOutlined /></Button></Dropdown>
@@ -221,14 +230,14 @@ const ServiceList = props => {
           <PlusOutlined /> 新建
         </Button>,
       ]}
-        rowKey='_id'
+        rowKey='id'
         columns={columns}
         expandable={{
           expandedRowRender,
         }}
         search={{
           collapseRender: false,
-          collapsed: false,
+          defaultCollapsed: false,
         }}
         toolbar={{
           menu: {

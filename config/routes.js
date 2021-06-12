@@ -1,4 +1,4 @@
-﻿export default [
+export default [
   {
     path: '/user',
     layout: false,
@@ -56,14 +56,26 @@
     path: '/order',
     name: '订单管理',
     icon: 'project',
-    component: './order/list',
+    routes: [
+      {
+        path: '/order/list',
+        name: '订单列表',
+        component: './order/list',
+      },
+      {
+        path: '/order/evaluate-list',
+        name: '评价列表',
+        component: './order/evaluate-list',
+      },
+      {
+        path: '/order/detail',
+        name: '订单详情',
+        component: './order/detail',
+        hideInMenu: true,
+      },
+    ],
   },
-  {
-    path: '/order/detail',
-    name: '订单详情',
-    component: './order/detail',
-    hideInMenu: true,
-  },
+
   {
     path: '/shop',
     name: '店铺管理',
@@ -384,6 +396,33 @@
         component: './app/diy',
       },
     ],
+  },
+  {
+    name: '内容管理',
+    path: '/cms',
+    icon: 'container',
+    routes: [
+      {
+      path: '/cms/article-category',
+      name: '文章分类',
+      component: './cms/articleCategory/list',
+    }, {
+      path: '/cms/article',
+      name: '文章管理',
+      component: './cms/article/list',
+    },
+      {
+        path: '/cms/article/add',
+        name: '新增文章',
+        hideInMenu: true,
+        component: './cms/article/form',
+      },
+      {
+        path: '/cms/article/edit',
+        name: '修改文章',
+        hideInMenu: true,
+        component: './cms/article/form',
+      }],
   },
   {
     path: '/',

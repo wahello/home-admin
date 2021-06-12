@@ -24,7 +24,7 @@ const Enums = {
   },
   payType: {
     PART: {
-      text: '预定金',
+      text: '定金',
       value: 'PART',
     },
     BEFORE: {
@@ -109,24 +109,24 @@ const Enums = {
     },
   },
   platform: {
-    'mp-weixin': {
+    'MP_WEIXIN': {
       text: '微信小程序',
-      value: 'mp-weixin',
+      value: 'MP_WEIXIN',
       icon: <MyIcon type={'weixin'} size={20} color={'#09BB07'} />,
     },
-    'mp-alipay': {
+    'MP_ALIPAY': {
       text: '支付宝小程序',
-      value: 'mp-alipay',
+      value: 'MP_ALIPAY',
       icon: <MyIcon type={'zhifubao'} size={20} color={'#06B4FD'} />,
     },
-    'mp-baidu': {
+    'MP-BAIDU': {
       text: '百度小程序',
-      value: 'mp-baidu',
+      value: 'MP-BAIDU',
       icon: <MyIcon type={'baidu'} size={20} color={'#306CFF'} />,
     },
-    'mp-toutiao': {
+    'MP-TOUTIAO': {
       text: '抖音小程序',
-      value: 'mp-toutiao',
+      value: 'MP-TOUTIAO',
       icon: <MyIcon type={'douyin'} size={20} color={'#070103'} />,
     },
   },
@@ -216,6 +216,10 @@ const Enums = {
     },
   },
   giftType: {
+    NONE: {
+      text: '未中奖',
+      value:'NONE',
+    },
     COUPON: {
       text: '优惠券',
       value: 'COUPON',
@@ -257,8 +261,12 @@ const Enums = {
       value: 'SYSTEM',
     },
     LUCKY: {
-      text: '抽奖',
+      text: '抽奖花费',
       value: 'LUCKY',
+    },
+    LUCKY_GIFT: {
+      text: '抽奖奖品',
+      value: 'LUCKY_GIFT',
     },
     RECHARGE: {
       text: '充值',

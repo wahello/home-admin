@@ -28,7 +28,7 @@ const serviceColumns = [
   },
   {
     title: '规格',
-    dataIndex: 'sku_name',
+    dataIndex: 'skuName',
     width: '15%',
     editable: false,
   },
@@ -55,7 +55,7 @@ const serviceColumns = [
   },
   {
     title: '拼团价格',
-    dataIndex: 'group_price',
+    dataIndex: 'groupPrice',
     valueType: 'money',
     width: '15%',
     formItemProps: {
@@ -73,7 +73,7 @@ const GroupForm = props => {
   const [baseForm] = Form.useForm();
   const serviceRef = useRef();
   const [editableKeys, setEditableRowKeys] = useState([]);
-  const [serviceVisible,toggleServiceVisible] = useBoolean(false)
+  const [serviceVisible, toggleServiceVisible] = useBoolean(false);
 
   const disabledKeys = useMemo(() => {
     return [...new Set(editableKeys.map(it => it.split('_')[0]))];
@@ -83,48 +83,51 @@ const GroupForm = props => {
 
   useEffect(() => {
     if (id) {
-      getRequest.run({ id });
+      getRequest.run(id);
     }
   }, [id]);
+
   useEffect(() => {
     if (getRequest.data) {
       const initData = getRequest.data;
-      if (initData.service._id) {
+      if (initData.service.id) {
         const keys = [];
         initData.services = initData.skus.map(sku => {
           const originalSku = initData.service.skus.find(it => it.id === sku.id);
-          keys.push(`${initData.service_id}_${sku.id}`);
+          keys.push(`${initData.serviceId}_${sku.id}`);
           return {
-            service_id: initData.service_id,
-            sku_id: sku.id,
+            serviceId: initData.serviceId,
+            skuId: sku.id,
             price: originalSku?.price,
             name: initData.service.name,
-            sku_name: originalSku?.name,
-            group_price: sku.group_price,
+            skuName: originalSku?.name,
+            groupPrice: sku.groupPrice,
             pic: originalSku?.pic,
           };
         });
         setEditableRowKeys(keys);
       }
-      baseForm.setFieldsValue(getRequest.data);
+      baseForm.setFieldsValue({
+        ...getRequest.data,
+        dateRange:[getRequest.data.startTime,getRequest.data.endTime]
+      });
     }
   }, [getRequest.data]);
-
   const onSelectService = (rows) => {
     const keys = [];
     const addService = [];
     const services = baseForm.getFieldValue('services') || [];
-    rows.filter(it => !disabledKeys.includes(it._id)).forEach(it => {
+    rows.filter(it => !disabledKeys.includes(it.id)).forEach(it => {
       it.skus.forEach(sku => {
-        keys.push(`${it._id}_${sku.id}`);
+        keys.push(`${it.id}_${sku.id}`);
         addService.push({
-          service_id: it._id,
-          sku_id: sku.id,
+          serviceId: it.id,
+          skuId: sku.id,
           price: sku.price,
           name: it.name,
-          sku_name: it.name,
-          group_price: 0,
-          pic: it.main_pic,
+          skuName: it.name,
+          groupPrice: 0,
+          pic: sku.pic,
         });
       });
     });
@@ -132,36 +135,35 @@ const GroupForm = props => {
       'services': services.concat(addService),
     });
     setEditableRowKeys([...editableKeys, ...keys]);
-    toggleServiceVisible.setFalse()
+    toggleServiceVisible.setFalse();
   };
   const onFinish = async values => {
     try {
-      const groups = Object.entries(_.groupBy(values.services, 'service_id')).map(([serviceId, skus]) => {
+      const groups = Object.entries(_.groupBy(values.services, 'serviceId')).map(([serviceId, skus]) => {
         const group = {
           name: values.name,
-          date_range: values.date_range,
-          join_min: values.join_min,
-          join_hours: values.join_hours,
-          virtual_hours: values.virtual_hours,
-          allow_single: values.allow_single,
-          allow_virtual: values.allow_virtual,
-          service_id: serviceId,
+          joinMin: values.joinMin,
+          joinHours: values.joinHours,
+          virtualHours: values.virtualHours,
+          allowSingle: values.allowSingle,
+          allowVirtual: values.allowVirtual,
+          serviceId,
           skus: skus.map(sku => {
             return {
-              id: sku.sku_id,
-              group_price: sku.group_price,
+              id: sku.skuId,
+              groupPrice: sku.groupPrice,
             };
           }),
         };
-        group.date_range[0] = moment(group.date_range[0]).startOf('days').valueOf();
-        group.date_range[1] = moment(group.date_range[1]).endOf('days').valueOf();
+        group.startTime = moment(values.dateRange[0]).startOf('days').valueOf();
+        group.endTime = moment(values.dateRange[1]).endOf('days').valueOf();
         return group;
       });
 
       if (id) {
-        await GroupApi.update({ group: groups[0], id });
+        await GroupApi.update({ ...groups[0], id });
       } else {
-        await GroupApi.add({ groups });
+        await GroupApi.add(groups);
       }
       message.success('保存成功');
       history.goBack();
@@ -189,9 +191,6 @@ const GroupForm = props => {
                          submitText: '保存',
                        },
                        render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
-                       submitButtonProps: {
-                         size: 'large',
-                       },
                      }}
                      scrollToFirstError>
               <ProFormText
@@ -202,14 +201,14 @@ const GroupForm = props => {
                 rules={[{ required: true }]}
                 extra={'活动名称将显示在活动列表中，方便商家管理'}
               />
-              <ProFormDateRangePicker name={'date_range'} label={'活动时间'} rules={[{ required: true }]} />
+              <ProFormDateRangePicker name={'dateRange'} label={'活动时间'} rules={[{ required: true }]} />
 
               <ProForm.Item label={'参团人数'} extra={'最低两人成团'} required>
                 <ProFormDigit
                   width={100}
                   initialValue={2}
                   fieldProps={{ precision: 0 }}
-                  name={'join_min'}
+                  name={'joinMin'}
                   min={2}
                   rules={[{ required: true }]}
                   placeholder={''}
@@ -222,7 +221,7 @@ const GroupForm = props => {
                   width={100}
                   initialValue={24}
                   fieldProps={{ precision: 0 }}
-                  name={'join_hours'}
+                  name={'joinHours'}
                   min={1}
                   rules={[{ required: true }]}
                   placeholder={''}
@@ -231,7 +230,7 @@ const GroupForm = props => {
                 <span> 小时</span>
               </ProForm.Item>
               <ProFormRadio.Group
-                name='allow_virtual'
+                name='allowVirtual'
                 label='是否虚拟成团'
                 initialValue={false}
                 options={[
@@ -245,16 +244,16 @@ const GroupForm = props => {
                   },
                 ]}
               />
-              <ProFormDependency name={['join_hours', 'allow_virtual']}>
-                {({ join_hours, allow_virtual }) => {
-                  return allow_virtual ?
+              <ProFormDependency name={['joinHours', 'allowVirtual']}>
+                {({ joinHours, allowVirtual }) => {
+                  return allowVirtual ?
                     <ProForm.Item label={'虚拟成团时间'} extra={'用户开团后若超过该时间，系统会自动成团'} required>
                       <ProFormDigit
                         width={100}
                         fieldProps={{ precision: 0 }}
-                        name={'virtual_hours'}
+                        name={'virtualHours'}
                         min={1}
-                        max={join_hours - 1}
+                        max={joinHours - 1}
                         rules={[{ required: true }]}
                         placeholder={''}
                         noStyle
@@ -269,8 +268,8 @@ const GroupForm = props => {
               >
                 <ProForm.Item name={'services'} trigger='onValuesChange' noStyle rules={[{ required: true }]}>
                   <EditableProTable
-                    style={{ display: (editableKeys.length || id) ? 'block' : 'none',marginBottom:10 }}
-                    rowKey={record => `${record.service_id}_${record.sku_id}`}
+                    style={{ display: (editableKeys.length || id) ? 'block' : 'none', marginBottom: 10 }}
+                    rowKey={record => `${record.serviceId}_${record.skuId}`}
                     actionRef={serviceRef}
                     toolBarRender={false}
                     recordCreatorProps={false}
@@ -285,7 +284,8 @@ const GroupForm = props => {
                     }}
                   />
                 </ProForm.Item>
-                <ServicePicker visible={serviceVisible} onCancel={toggleServiceVisible.setFalse} disabledKeys={disabledKeys} onChange={onSelectService} />
+                <ServicePicker visible={serviceVisible} onCancel={toggleServiceVisible.setFalse}
+                               disabledKeys={disabledKeys} onChange={onSelectService} />
                 {!id && <Button type={'primary'} onClick={toggleServiceVisible.setTrue}>选择服务</Button>}
               </ProForm.Item>
             </ProForm>}

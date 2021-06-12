@@ -6,13 +6,10 @@ import MemberApi from '@/services/member';
 import { useBoolean } from 'ahooks';
 import EditUserAddress from '@/pages/member/components/EditUserAddress';
 
-const UserAddressTable = ({ userId }) => {
+const UserAddressTable = ({ memberId }) => {
   const tableRef = useRef();
   const pageRequest = params => {
-    return MemberApi.pageAddress({
-      ...params,
-      userId,
-    });
+    return MemberApi.pageAddress(memberId,params);
   };
   const [editVisible, toggleEditVisible] = useBoolean(false);
   const [editAddress, setEditAddress] = useState();
@@ -29,15 +26,15 @@ const UserAddressTable = ({ userId }) => {
     {
       dataIndex: 'location',
       title: '地址',
-      render: (location, { default_flag }) => {
+      render: (location, { defaultFlag }) => {
         return <Space>
           <span>{location}</span>
-          {default_flag && <Tag color={'blue'}>默认地址</Tag>}
+          {defaultFlag && <Tag color={'blue'}>默认地址</Tag>}
         </Space>;
       },
     },
     {
-      dataIndex: 'detail_address',
+      dataIndex: 'detailAddress',
       title: '门牌号',
     },
     {
@@ -60,7 +57,7 @@ const UserAddressTable = ({ userId }) => {
     <ProTable
       size={'small'}
       actionRef={tableRef} request={pageRequest}
-      rowKey='_id'
+      rowKey='id'
       pagination={{ pageSize: 10 }}
       columns={columns}
       search={false}
@@ -73,7 +70,7 @@ const UserAddressTable = ({ userId }) => {
 };
 
 UserAddressTable.propTypes = {
-  userId: PropTypes.string,
+  memberId: PropTypes.string,
 };
 
 export default UserAddressTable;

@@ -1,4 +1,4 @@
-﻿// do some test init
+// do some test init
 
 const localStorageMock = {
   getItem: jest.fn(),

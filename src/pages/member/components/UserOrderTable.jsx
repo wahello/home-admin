@@ -1,50 +1,48 @@
 import React, { useRef } from 'react';
-import { Button, Space, Tag } from 'antd';
+import { Button, Popconfirm, Space, Tag } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import OrderApi from '@/services/order/order';
 import { history } from 'umi';
 import PropTypes from 'prop-types';
 import Enums from '@/utils/enums';
 import ServiceItem from '@/components/ServiceItem';
+import MemberApi from '@/services/member';
 
-const UserOrderTable = ({ userId }) => {
+const UserOrderTable = ({ memberId }) => {
 
   const tableRef = useRef();
 
   const pageRequest = params => {
-    return OrderApi.page({
-      ...params,
-      userId,
-    });
+    return MemberApi.pageOrder(memberId, params);
   };
 
 
   const columns = [
     {
       title: '订单号',
-      dataIndex: 'order_no',
-      width: 220,
-      render: (v, { type }) => <Space direction={'vertical'}>
+      dataIndex: 'orderNo',
+      width: 300,
+      render: (v, { orderType, platform }) => <Space size={'small'}>
         <span>{v}</span>
-        <Tag color={Enums.orderType[type]?.color}>{Enums.orderType[type]?.text}</Tag>
+
+        {orderType !== Enums.orderType.NORMAL.value &&
+        <Tag color={Enums.orderType[orderType]?.color}>{Enums.orderType[orderType]?.text}</Tag>}
       </Space>,
       copyable: true,
     },
     {
       title: '服务信息',
       dataIndex: 'service',
-      width: 300,
-      render: (it) => <ServiceItem service={it} />,
-      hideInSearch: true,
+      width: 250,
+      render: (_, { service, sku, num }) => <ServiceItem service={service} sku={sku} num={num} />,
     },
     {
-      title: '地址',
+      title: '上门地址',
       dataIndex: 'address',
       width: 300,
       render: (it) => <div>
         <Space size={'small'} direction={'vertical'}>
           <Space>
-            <span>{it.name}</span>
+            <span>{it.contract}</span>
             <span>{it.mobile}</span>
           </Space>
           <span>{it.location}</span>
@@ -53,28 +51,30 @@ const UserOrderTable = ({ userId }) => {
       hideInSearch: true,
     },
     {
-      title: '预约时间',
-      dataIndex: 'appoint_time',
-      hideInSearch: true,
+      title: '上门时间',
+      dataIndex: 'appointTime',
       width: 150,
+      valueType: 'dateTime',
     },
     {
       title: '支付模式',
-      dataIndex: ['service', 'pay', 'type'],
+      dataIndex: 'payType',
       valueEnum: Enums.payType,
-      width: 150,
+      width: 100,
     },
     {
       title: '实付金额',
-      dataIndex: 'actual_fee',
-      width: 150,
+      dataIndex: 'actualFee',
       valueType: 'money',
+      hideInSearch: true,
+      width: 100,
     },
     {
-      title: '已支付金额',
-      dataIndex: 'paid_fee',
-      width: 150,
+      title: '已付金额',
+      dataIndex: 'paidFee',
       valueType: 'money',
+      hideInSearch: true,
+      width: 100,
     },
     {
       title: '状态',
@@ -86,7 +86,8 @@ const UserOrderTable = ({ userId }) => {
     },
     {
       title: '下单时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       width: 150,
       hideInSearch: true,
     },
@@ -94,24 +95,25 @@ const UserOrderTable = ({ userId }) => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, { _id }) => (<Space>
-        <Button type={'link'}
-                onClick={() => history.push(`/order/detail?id=${_id}`)}>查看详情</Button>
-      </Space>),
-    },
-  ];
+      align: 'center',
+      render: (_, {
+        id,
+      }) => {
+        return <Button type={'link'} onClick={() => history.push(`/order/detail?id=${id}`)}>详情</Button>;
+      },
+    }];
 
   return <ProTable
     size={'small'}
     actionRef={tableRef} request={pageRequest} toolBarRender={() => []}
-    rowKey='_id'
-    pagination={{pageSize:10}}
+    rowKey='id'
+    pagination={{ pageSize: 10 }}
     columns={columns}
   />;
 
 };
 UserOrderTable.propTypes = {
-  userId: PropTypes.string,
+  memberId: PropTypes.string,
 };
 
 export default UserOrderTable;

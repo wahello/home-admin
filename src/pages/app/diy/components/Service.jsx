@@ -4,8 +4,7 @@ import styles from './Service.less';
 import goodImg from '@/assets/good_bg.png';
 
 const Service = ({ settings }) => {
-  const { type, dataType, ...extraStyle } = settings;
-
+  const { type, dataType,themeColor,btnColor,btnText, ...extraStyle } = settings;
 
   const renderItem = useMemo(() => {
       switch (type) {
@@ -23,10 +22,10 @@ const Service = ({ settings }) => {
               </div>
               <div className={styles.footer}>
                 <div className={styles.tags}>
-                  <div className={styles.tag}>专业工具</div>
-                  <div className={styles.tag}>全拆清洗</div>
+                  <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>专业工具</div>
+                  <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>全拆清洗</div>
                 </div>
-                <div className={styles.btn}>立即预约</div>
+                <div className={styles.btn} style={{background:themeColor,color:btnColor}}>{btnText}</div>
               </div>
             </div>
           </div>;
@@ -35,12 +34,19 @@ const Service = ({ settings }) => {
             <img src={goodImg} className={styles.serviceImg} />
             <div className={styles.serviceBody}>
               <div className={styles.serviceName}>服务名称</div>
+              <div className={styles.tags}>
+                <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>专业工具</div>
+                <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>全拆清洗</div>
+              </div>
               <div className={styles.footer}>
                 <div>
                   <div className={styles.price}>￥120</div>
                   <div className={styles.linePrice}>￥240</div>
                 </div>
-                <div className={styles.sales}>已服务3129次</div>
+                <div>
+                  <div className={styles.sales}>已服务3129次</div>
+                  <div className={styles.btn} style={{background:themeColor,color:btnColor}}>{btnText}</div>
+                </div>
               </div>
             </div>
           </div>;
@@ -53,25 +59,26 @@ const Service = ({ settings }) => {
             <div className={styles.serviceBody}>
               <div className={styles.serviceName}>服务名称</div>
               <div className={styles.tags}>
-                <div className={styles.tag}>专业工具</div>
-                <div className={styles.tag}>全拆清洗</div>
+                <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>专业工具</div>
+                <div className={styles.tag} style={{borderColor:themeColor,color:themeColor}}>全拆清洗</div>
               </div>
+            </div>
+            <div className={styles.footer}>
               <div className={styles.priceWrapper}>
                 <div className={styles.price}>￥120</div>
                 <div className={styles.linePrice}>￥240</div>
               </div>
+              <div className={styles.btn} style={{background:themeColor,color:btnColor}}>{btnText}</div>
             </div>
           </div>;
         default:
           return null;
       }
-    }, [type]);
+    }, [btnColor, btnText, themeColor, type]);
   return (
     <div className={styles.list} style={extraStyle}>
       {
-        [1, 2, 3, 4].map(()=>{
-          return renderItem;
-        })
+        renderItem
       }
     </div>
   );

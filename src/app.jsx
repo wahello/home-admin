@@ -25,10 +25,8 @@ export const initialStateConfig = {
 export async function getInitialState() {
   const initInfo = async () => {
     try {
-      const {
-        userInfo,
-      } = await LoginApi.currentUser();
-      return { userInfo };
+      const userRes = await LoginApi.currentUser();
+      return { userInfo: userRes.data };
     } catch (error) {
       console.error(error);
       history.push(loginPath);
@@ -116,7 +114,7 @@ const errorCodeMessage = {
 const errorHandler = (error) => {
   const { name, response } = error;
   if (name === 'BizError') {
-    message.error(errorCodeMessage[error.info.errorCode]||error.info.errorMessage);
+    message.error(errorCodeMessage[error.info.errorCode] || error.info.errorMessage);
   } else {
     if (response && response.status) {
       const errorText = codeMessage[response.status] || response.statusText;
@@ -136,30 +134,23 @@ const errorHandler = (error) => {
   }
   throw error;
 };
-
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request = {
   errorHandler,
+  prefix: isDev?'':'https://api.anjujing.cn',
   requestInterceptors: [(url, options) => {
-    if (url.startsWith('http')) {
-      return {
-        url, options: {
-          ...options,
-          headers: {
-            ...options.headers,
-          },
-        },
-      };
+    const authHeader = {};
+    const token = localStorage.getItem('token');
+    if (token) {
+      authHeader.Authorization = token;
     }
     return {
-      url: 'https://6330733a-7e48-4972-9c93-39caf08ddb2a.bspapp.com/http/api',
+      url,
       options: {
         ...options,
-        method: 'POST',
-        data: {
-          '$url': url,
-          uni_id_token: localStorage.getItem('uni_id_token'),
-          data: options.data,
+        headers: {
+          ...options.headers,
+          ...authHeader,
         },
       },
     };
@@ -169,7 +160,7 @@ export const request = {
       return {
         success: resData.code === 0,
         errorCode: resData.code,
-        errorMessage: resData.msg,
+        errorMessage: resData.message,
       };
     },
   },

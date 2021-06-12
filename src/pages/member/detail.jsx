@@ -3,7 +3,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 import MemberApi from '@/services/member';
 import ProDescriptions from '@ant-design/pro-descriptions';
-import { Avatar, Button, InputNumber, Space } from 'antd';
+import { Avatar, InputNumber, message, Space } from 'antd';
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
 import Enums from '@/utils/enums';
 import UserOrderTable from '@/pages/member/components/UserOrderTable';
@@ -13,12 +13,11 @@ import UserAddressTable from '@/pages/member/components/UserAddressTable';
 import UserAccountTable from '@/pages/member/components/UserAccountTable';
 import AdjustAccountForm from '@/pages/member/components/AdjustAccountForm';
 import { useBoolean } from 'ahooks';
-import { history } from 'umi';
 
 
 const MemberDetail = props => {
   const { id } = props.location.query;
-  const { data: member, loading, error, refresh } = useRequest(() => MemberApi.get({ userId: id }),);
+  const { data: member, loading, error, refresh } = useRequest(() => MemberApi.get(id));
   const [activeKey, setActiveKey] = useState('account');
   const [adjustVisible, toggleAdjustVisible] = useBoolean(false);
   const [adjustType, setAdjustType] = useState(Enums.accountType.BALANCE.value);
@@ -27,11 +26,16 @@ const MemberDetail = props => {
   const accountRef = useRef();
 
   const updateUser = async (key, values) => {
+    if (!values[key]) {
+      message.error('不能为空');
+      return false;
+    }
     await MemberApi.update({
       id,
       [key]: values[key],
     });
     refresh();
+    return true;
   };
   const adjustBalance = () => {
     setAdjustType(Enums.accountType.BALANCE.value);
@@ -58,21 +62,28 @@ const MemberDetail = props => {
       title: '手机号',
     },
     {
-      dataIndex: ['invite_user','_id'],
+      dataIndex: 'realName',
+      title: '真实姓名',
+    },
+    {
+      dataIndex: 'inviteUser',
       title: '上级用户',
-      render: (it,{invite_user}) => {
-        return it ?  <a onClick={() => window.open(`./detail?id=${it}`)}>{invite_user.nickname}</a>:'-'
+      render: (it, { inviteUser }) => {
+        return inviteUser ? <a onClick={() => window.open(`./detail?id=${it}`)}>{inviteUser.nickname}</a> : '-';
       },
-      editable: false
+      editable: false,
     },
     {
       dataIndex: 'gender',
       valueEnum: Enums.gender,
       title: '性别',
+      fieldProps: {
+        allowClear: false,
+      },
     },
     {
       dataIndex: 'platform',
-      title: '注册平台',
+      title: '用户来源',
       editable: false,
       render: it => {
         const platform = Enums.platform[it];
@@ -83,14 +94,8 @@ const MemberDetail = props => {
       },
     },
     {
-      dataIndex: 'register_date',
+      dataIndex: 'createTime',
       title: '注册时间',
-      valueType: 'dateTime',
-      editable: false,
-    },
-    {
-      dataIndex: 'last_login_date',
-      title: '最后登录时间',
       valueType: 'dateTime',
       editable: false,
     },
@@ -119,20 +124,17 @@ const MemberDetail = props => {
       editable: false,
     },
     {
-      dataIndex: 'rebate_balance',
+      dataIndex: 'rebateBalance',
       title: '分销奖励',
       valueType: 'money',
     },
     {
-      dataIndex: 'rebate_rate',
-      title: '分销比例',
-      valueType: 'integer',
-      renderFormItem: () => <InputNumber min={0} max={100} precision={0} />,
-      render: it => it ? `${it}%` : '系统默认',
+      dataIndex: 'rebateRate',
+      title: '分销奖励倍数',
+      renderFormItem: () => <InputNumber min={0} max={100} precision={2} step={0.01} />,
     },
   ];
 
-  console.log(accountRef);
 
   return (
     <>
@@ -149,8 +151,6 @@ const MemberDetail = props => {
                 onSave: updateUser,
               }}
             />
-
-
           </>
         }
         tabList={[
@@ -178,17 +178,17 @@ const MemberDetail = props => {
         tabActiveKey={activeKey}
         onTabChange={setActiveKey}
       >
-        {activeKey === 'account' && <UserAccountTable userId={id} ref={accountRef} />}
-        {activeKey === 'order' && <UserOrderTable userId={id} />}
-        {activeKey === 'coupon' && <UserCouponTable userId={id} />}
-        {activeKey === 'favorite' && <UserFavoriteTable userId={id} />}
-        {activeKey === 'address' && <UserAddressTable userId={id} />}
+        {activeKey === 'account' && <UserAccountTable memberId={id} ref={accountRef} />}
+        {activeKey === 'order' && <UserOrderTable memberId={id} />}
+        {activeKey === 'coupon' && <UserCouponTable memberId={id} />}
+        {activeKey === 'favorite' && <UserFavoriteTable memberId={id} />}
+        {activeKey === 'address' && <UserAddressTable memberId={id} />}
       </PageContainer>
       <AdjustAccountForm onVisibleChange={toggleAdjustVisible.toggle} onFinish={() => {
         refresh();
         accountRef?.current.reset();
         return true;
-      }} visible={adjustVisible} user={member}
+      }} visible={adjustVisible} member={member}
                          type={adjustType} />
     </>
   );

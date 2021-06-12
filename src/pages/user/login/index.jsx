@@ -6,7 +6,6 @@ import { history, Link, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import styles from './index.less';
 import LoginApi from '@/services/login';
-import logo from '@/assets/logo-white.svg';
 
 
 const goto = () => {
@@ -14,7 +13,7 @@ const goto = () => {
   setTimeout(() => {
     const { query } = history.location;
     const { redirect } = query;
-    history.push(redirect||'/')
+    history.push(redirect || '/');
   }, 10);
 };
 
@@ -22,7 +21,6 @@ const goto = () => {
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const { initialState, setInitialState } = useModel('@@initialState');
-
 
 
   const fetchInitInfo = async () => {
@@ -41,11 +39,10 @@ const Login = () => {
         ...values,
       });
       message.success('登录成功！');
-      localStorage.setItem('uni_id_token', res.token);
-      localStorage.setItem('uni_id_token_expired', res.tokenExpired);
+      localStorage.setItem('token', res.data);
       await fetchInitInfo();
       goto();
-    }  finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -77,16 +74,16 @@ const Login = () => {
             onFinish={handleSubmit}
           >
             <ProFormText
-              name='username'
+              name='mobile'
               fieldProps={{
                 size: 'large',
                 prefix: <UserOutlined className={styles.prefixIcon} />,
               }}
-              placeholder='用户名'
+              placeholder='手机号'
               rules={[
                 {
                   required: true,
-                  message: '用户名是必填项！',
+                  message: '手机号是必填项！',
                 },
               ]}
             />

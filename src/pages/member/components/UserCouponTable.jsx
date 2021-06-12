@@ -17,47 +17,45 @@ const columns = [
   },
   {
     title: '优惠券类型',
-    dataIndex: ['discount', 'type'],
+    dataIndex: 'discountType',
     valueType: 'radio',
     valueEnum: Enums.discountType,
   },
   {
     title: '优惠金额/折扣',
-    dataIndex: ['discount', 'deduction'],
+    dataIndex: 'deduction',
     render: (_, record) => {
-      return record.discount.type === Enums.discountType.DEDUCTION.value ? `￥${record.discount.deduction}` : `${record.discount.rebate}折`;
+      return record.discountType === Enums.discountType.DEDUCTION.value ? `￥${record.deduction}` : `${record.rebate}折`;
     },
     hideInSearch: true,
   },
   {
     title: '使用门槛',
-    dataIndex: ['discount', 'use_min'],
+    dataIndex: 'useMin',
     valueType: 'money',
     hideInSearch: true,
   },
   {
     title: '有效期限',
-    dataIndex: 'expire',
+    dataIndex: 'expireDate',
     render: it => {
-      return it.type === Enums.expireType.DATE.value ? `${moment(it.expire_date).format('YYYY-MM-DD')}前有效` : `领取后${it.expire_day}天有效`;
+      return `${moment(it.expire_date).format('YYYY-MM-DD')}前有效`;
     },
     hideInSearch: true,
   },
   {
     title: '领取时间',
-    dataIndex: '_add_time_str',
+    dataIndex: 'createTime',
+    valueType: 'dateTime',
     hideInSearch: true,
   },
 
 ];
-const UserCouponTable = ({ userId }) => {
+const UserCouponTable = ({ memberId }) => {
   const tableRef = useRef();
 
   const pageRequest = params => {
-    return MemberApi.pageCoupon({
-      ...params,
-      userId,
-    });
+    return MemberApi.pageCoupon(memberId,params);
   };
 
   const [sendCouponVisible, toggleSendCouponVisible] = useBoolean(false);
@@ -66,7 +64,7 @@ const UserCouponTable = ({ userId }) => {
     <ProTable
       size={'small'}
       actionRef={tableRef} request={pageRequest}
-      rowKey='_id'
+      rowKey='id'
       pagination={{ pageSize: 10 }}
       toolBarRender={() => [
         <Button
@@ -78,7 +76,7 @@ const UserCouponTable = ({ userId }) => {
       ]}
       columns={columns}
     />
-    <SendCoupon userId={userId} onFinish={() => {
+    <SendCoupon memberId={memberId} onFinish={() => {
       tableRef?.current.reload();
       return true;
     }} onVisibleChange={toggleSendCouponVisible.toggle} visible={sendCouponVisible} />
@@ -86,7 +84,7 @@ const UserCouponTable = ({ userId }) => {
 };
 
 UserCouponTable.propTypes = {
-  userId: PropTypes.string,
+  memberId: PropTypes.string,
 };
 
 export default UserCouponTable;

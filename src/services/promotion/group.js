@@ -2,24 +2,36 @@ import { request } from 'umi';
 
 const GroupApi = {
   add: async (data) => {
-    return request('admin/promotion/group/sys/add', { data });
+    return request('/api/group', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/promotion/group/sys/update', { data });
+    return request('/api/group', {
+      method: 'POST',
+      data,
+    });
   },
   changeState: async (data) => {
-    return request('admin/promotion/group/sys/changeState', { data });
+    return request(`/api/group/changeState`, { method: 'POST', data });
   },
   page: async (data) => {
-    return request('admin/promotion/group/sys/page',{data});
-  },  pageRecord: async (data) => {
-    return request('admin/promotion/group/sys/pageRecord',{data});
+    return request('/api/group/page', {
+      method: 'POST',
+      data,
+    });
   },
-  get: async (data) => {
-    return request('admin/promotion/group/sys/get', { data });
+  pageRecord: async (data) => {
+    return request('/api/group-record/page', { method: 'POST', data });
   },
-  remove: async (data) => {
-    return request('admin/promotion/group/sys/remove', { data });
+  get: async (id) => {
+    return request(`/api/group/${id}`);
+  },
+  remove: async (id) => {
+    return request(`/api/group/${id}`, {
+      method: 'DELETE',
+    });
   },
   copy: async (data) => {
     return request('admin/promotion/group/sys/copy', { data });

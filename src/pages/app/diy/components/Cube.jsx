@@ -6,6 +6,7 @@ import styles from './Cube.less';
 
 const Cube = ({ settings }) => {
   const { type, pics,...extraStyle } = settings;
+  console.log(extraStyle);
   return (
     <div className={styles[`cube_${type}`]} style={extraStyle}>
       {pics?.map((pic, idx) => <img className={styles.cubeImg} src={pic.pic || errorImg} key={`${idx}`} />)}

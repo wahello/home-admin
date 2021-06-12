@@ -3,6 +3,7 @@ import { defineConfig } from 'umi';
 
 import defaultSettings from './defaultSettings';
 import routes from './routes';
+import proxy from './proxy';
 
 
 export default defineConfig({
@@ -33,16 +34,13 @@ export default defineConfig({
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,
-  manifest: {
-    basePath: '/',
-  },
-  publicPath: '/manage/',
   // Fast Refresh 热更新
   fastRefresh: {},
   nodeModulesTransform: {
     type: 'none',
     exclude: [],
   },
+  proxy: proxy['dev'],
   // extraBabelPlugins: [['import', {
   //   libraryName: '@ant-design/charts',
   //   libraryDirectory: 'lib',

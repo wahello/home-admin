@@ -33,7 +33,7 @@ const MaterialCategoryForm = ({ id, visible, onVisibleChange, onFinish }) => {
     return onFinish();
   };
   return (
-    <ModalForm form={form} submitter={{
+    <ModalForm form={form} modalProps={{ centered: true }} submitter={{
       submitButtonProps: {
         disabled: loading || error,
       },

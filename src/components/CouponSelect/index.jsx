@@ -14,8 +14,8 @@ const CouponSelect = props => {
     request={async () => {
       const { data: couponList } = await CouponApi.list();
       return couponList?.map(it => ({
-        value: it._id,
-        label: `${it.name} 满${it.discount.use_min}${it.discount.type === Enums.discountType.DEDUCTION.value ? (`减${it.discount.deduction}`) : (`打${it.discount.rebate}折`)}`,
+        value: it.id,
+        label: `${it.name} 满${it.useMin}${it.discountType === Enums.discountType.DEDUCTION.value ? (`减${it.deduction}`) : (`打${it.rebate}折`)}`,
       }));
     }}
   />;

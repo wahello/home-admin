@@ -2,19 +2,31 @@ import { request } from 'umi';
 
 const MaterialApi = {
   add: async (data) => {
-    return request('admin/material/sys/add', { data });
-  },
-  update: async (data) => {
-    return request('admin/material/sys/update', { data });
+    return request('/api/material', {
+      method: 'PUT',
+      data,
+    });
   },
   page: async (data) => {
-    return request('admin/material/sys/page',{data});
+    return request('/api/material/page', {
+      method: 'POST',
+      data,
+    });
   },
   remove: async (data) => {
-    return request('admin/material/sys/remove', { data });
+    return request(`/api/material/removeByIds`, {
+      method: 'DELETE',
+      data,
+    });
   },
   move: async (data) => {
-    return request('admin/material/sys/move', { data });
+    return request('/api/material/move', {
+      method: 'POST',
+      data,
+    });
+  },
+  preUpload: async () => {
+    return request('/api/material/preUpload');
   },
 };
 export default MaterialApi;

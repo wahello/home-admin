@@ -15,7 +15,7 @@ import { useRequest } from '@@/plugin-request/request';
 import CouponApi from '@/services/promotion/coupon';
 import Enums from '@/utils/enums';
 import ServiceCategoryApi from '@/services/shop/service-category';
-import { history } from '@@/core/history';
+import { history } from 'umi';
 import moment from 'moment';
 import LimitServiceFormItem from '@/pages/promotion/coupon/components/LimitServiceFormItem';
 
@@ -28,12 +28,15 @@ const CouponForm = props => {
 
   useEffect(() => {
     if (id) {
-      getRequest.run({ id });
+      getRequest.run(id);
     }
   }, [id]);
   useEffect(() => {
     if (getRequest.data) {
-      baseForm.setFieldsValue(getRequest.data);
+      baseForm.setFieldsValue({
+        ...getRequest.data,
+        limitCategoryIds:getRequest.data.limitCategoryIds?.split(",")
+      });
     }
   }, [getRequest.data]);
 
@@ -41,10 +44,11 @@ const CouponForm = props => {
     try {
       const submitValues = {
         ...values,
-        limit_services: values.limit_services?.map(it => it._id),
+        limitCategoryIds: values.limitCategoryIds?.length?values.limitCategoryIds.join(','):null,
+        limitServiceIds: values.limitServices?.map(it => it.id).join(","),
       };
-      if (submitValues.expire.type === Enums.expireType.DATE.value) {
-        submitValues.expire.expire_date = moment(submitValues.expire.expire_date).endOf('days').valueOf();
+      if (submitValues.expireType === Enums.expireType.DATE.value) {
+        submitValues.expireDate = moment(submitValues.expireDate).endOf('days').valueOf();
       }
       if (id) {
         await CouponApi.update({ ...submitValues, id });
@@ -88,28 +92,28 @@ const CouponForm = props => {
               rules={[{ required: true }]}
             />
             <ProFormRadio.Group
-              name={['discount', 'type']}
+              name={'discountType'}
               initialValue={Enums.discountType.DEDUCTION.value}
               label='优惠券类型'
               rules={[{ required: true }]}
               options={Object.values(Enums.discountType).map(({ text, value }) => ({ label: text, value }))}
             />
-            <ProFormDependency name={['discount', 'type']}>
-              {({ discount }) => discount?.type === Enums.discountType.DEDUCTION.value ?
+            <ProFormDependency name={['discountType']}>
+              {({ discountType }) => discountType === Enums.discountType.DEDUCTION.value ?
                 <ProForm.Item label={'优惠券面额'} extra={'价格不能小于0，可保留两位小数'}>
                   <ProFormDigit
                     width={100}
-                    name={['discount', 'deduction']}
+                    name='deduction'
                     rules={[{ required: true }]}
                     placeholder={''}
                     noStyle
                   />
                   <span> 元</span>
-                </ProForm.Item> : <ProForm.Item label={'优惠券折扣'} extra={'优惠券折扣不能小于1折，且不可大于9.9折，可保留两位小数'}>
+                </ProForm.Item> : <ProForm.Item label={'优惠券折扣'} extra={'优惠券折扣不能小于1折，且不可大于10折，可保留两位小数'}>
                   <ProFormDigit
                     width={100}
-                    name={['discount', 'rebate']}
-                    max={9.9}
+                    name='rebate'
+                    max={9.99}
                     min={1}
                     rules={[{ required: true }]}
                     placeholder={''}
@@ -122,7 +126,7 @@ const CouponForm = props => {
               <ProFormDigit
                 width={100}
                 initialValue={0}
-                name={['discount', 'use_min']}
+                name={'useMin'}
                 min={0}
                 rules={[{ required: true }]}
                 placeholder={''}
@@ -143,35 +147,22 @@ const CouponForm = props => {
               />
               <span> 张</span>
             </ProForm.Item>
-            <ProForm.Item label={'每人限领'}>
-              <ProFormDigit
-                width={100}
-                initialValue={1}
-                fieldProps={{ precision: 0 }}
-                name={'receive_limit'}
-                min={0}
-                rules={[{ required: true }]}
-                placeholder={''}
-                noStyle
-              />
-              <span> 张</span>
-            </ProForm.Item>
-            <ProFormSwitch name='is_public' label='是否公开' extra={'公开可以在领券中心和可用商品页看见'} />
+            <ProFormSwitch name='isPublic' label='是否公开' extra={'公开可以在领券中心和可用服务详情页看见'} />
             <ProFormRadio.Group
-              name={['expire', 'type']}
+              name={'expireType'}
               initialValue={Enums.expireType.DATE.value}
               label='有效期类型'
               rules={[{ required: true }]}
               options={Object.values(Enums.expireType).map(({ text, value }) => ({ label: text, value }))}
             />
-            <ProFormDependency name={['expire', 'type']}>
-              {({ expire }) => expire?.type === Enums.expireType.DATE.value ?
-                <ProFormDatePicker name={['expire', 'expire_date']} label='过期日期' />
+            <ProFormDependency name={['expireType']}>
+              {({ expireType }) => expireType === Enums.expireType.DATE.value ?
+                <ProFormDatePicker name={'expireDate'} label='过期日期' />
                 : <ProForm.Item label={'领取之日起'} extra={'不能小于0，且必须为整数'}>
                   <ProFormDigit
                     fieldProps={{ precision: 0 }}
                     width={100}
-                    name={['expire', 'expire_day']}
+                    name={'expireDay'}
                     min={1}
                     rules={[{ required: true }]}
                     noStyle
@@ -179,19 +170,19 @@ const CouponForm = props => {
                   <span> 天有效</span>
                 </ProForm.Item>}
             </ProFormDependency>
-            <ProFormSelect mode={'multiple'} name='limit_categories' label='限定可用分类' width='md' placeholder='请选择'
+            <ProFormSelect mode={'multiple'} name='limitCategoryIds' label='限定可用分类' width='md' placeholder='请选择'
                            request={async () => {
                              const { data: categoryList } = await ServiceCategoryApi.list();
-                             return categoryList?.map(({ _id, name, children }) => ({
-                               value: _id,
-                               label: name,
-                               children: children.map(it => ({ value: it._id, label: it.name })),
+                             return categoryList?.map((cat) => ({
+                               value: cat.id,
+                               label: cat.name,
+                               children: cat.children.map(it => ({ value: it.id, label: it.name })),
                                optionType: 'optGroup',
                              }));
                            }}
                            extra={'为空则所有分类都可用'}
             />
-            <ProForm.Item label={'限定可用商品'} name={'limit_services'} extra={'为空则所有服务都可用'}>
+            <ProForm.Item label={'限定可用商品'} name={'limitServices'} extra={'为空则所有服务都可用'} wrapperCol={{span:10}}>
               <LimitServiceFormItem />
             </ProForm.Item>
           </ProForm>}

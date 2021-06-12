@@ -1,19 +1,45 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Image, Modal } from 'antd';
+import { Button, Image, Modal, Space } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import GroupApi from '@/services/promotion/group';
+import moment from 'moment';
 
 
-const columns = [{
-  dataIndex: 'name',
-  title: '服务名称',
-}, {
-  dataIndex: 'main_pic',
-  title: '服务图片',
-  hideInSearch: true,
-  render: it => <Image src={it} width={40} height={40} preview={{ mask: false }} />,
-}, ];
+const columns = [
+  {
+    title: '拼团名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '拼团商品',
+    dataIndex: 'service',
+    render: (service) => {
+      return <Space><Image src={service.mainPic} width={50} height={50} /><span>{service.name}</span></Space>;
+    },
+    width: 200,
+  },
+  {
+    title: '活动时间',
+    dataIndex: 'startTime',
+    hideInSearch: true,
+    render: (_,{startTime,endTime}) => {
+      return `${moment(startTime).format('YYYY-MM-DD')} ~ ${moment(endTime).format('YYYY-MM-DD')}`;
+    },
+    width: 200,
+  },
+
+  {
+    title: '状态',
+    dataIndex: 'enable',
+    valueType: 'radioButton',
+    hideInSearch: true,
+    valueEnum: {
+      true: { text: '已开启', status: 'Processing' },
+      false: { text: '已关闭', status: 'Error' },
+    },
+  },
+];
 
 const GroupPicker = props => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -24,10 +50,10 @@ const GroupPicker = props => {
     const rows = [];
     if (props.value) {
       if (Array.isArray(props.value)) {
-        rowKeys.push(...props.value.map(it => it._id));
+        rowKeys.push(...props.value.map(it => it.id));
         rows.push(...props.value);
       } else {
-        rowKeys.push(props.value._id);
+        rowKeys.push(props.value.id);
         rows.push(props.value);
       }
     }
@@ -41,7 +67,7 @@ const GroupPicker = props => {
     if (rows.length) {
       const newRows = [...selectedRows];
       rows.filter(it => !!it).forEach(row => {
-        if (!newRows.find(it => it._id === row._id)) {
+        if (!newRows.find(it => it.id === row.id)) {
           newRows.push(row);
         }
       });
@@ -59,7 +85,7 @@ const GroupPicker = props => {
   };
   const getCheckboxProps = useCallback((record) => {
     return {
-      disabled: props.disabledKeys?.includes(record._id),
+      disabled: props.disabledKeys?.includes(record.id),
     };
   }, [props.disabledKeys]);
 
@@ -83,7 +109,7 @@ const GroupPicker = props => {
         getCheckboxProps,
       }}
       tableAlertRender={false}
-      rowKey='_id'
+      rowKey='id'
       columns={[
         ...columns,
         props.single && {

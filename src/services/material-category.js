@@ -1,20 +1,28 @@
 import { request } from 'umi';
 
 const MaterialCategoryApi = {
-  get: async (data) => {
-    return request('admin/material-category/sys/get', { data });
+  get: async (id) => {
+    return request(`/api/material/category/${id}`);
   },
   add: async (data) => {
-    return request('admin/material-category/sys/add', { data });
+    return request('/api/material/category', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/material-category/sys/update', { data });
+    return request('/api/material/category', {
+      method: 'POST',
+      data,
+    });
   },
   list: async () => {
-    return request('admin/material-category/sys/list');
+    return request('/api/material/category/list');
   },
-  remove: async (data) => {
-    return request('admin/material-category/sys/remove', { data });
+  remove: async (id) => {
+    return request(`/api/material/category/${id}`, {
+      method: 'DELETE',
+    });
   },
 };
 export default MaterialCategoryApi;

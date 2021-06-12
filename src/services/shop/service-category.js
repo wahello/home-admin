@@ -2,19 +2,27 @@ import { request } from 'umi';
 
 const ServiceCategoryApi = {
   add: async (data) => {
-    return request('admin/service-category/sys/add', { data });
+    return request('/api/item/category', {
+      method: 'PUT',
+      data,
+    });
   },
   update: async (data) => {
-    return request('admin/service-category/sys/update', { data });
+    return request('/api/item/category', {
+      method: 'POST',
+      data,
+    });
   },
   list: async () => {
-    return request('admin/service-category/sys/list');
+    return request('/api/item/category/list');
   },
-  get: async (data) => {
-    return request('admin/service-category/sys/get', { data });
+  get: async (id) => {
+    return request(`/api/item/category/${id}`);
   },
-  remove: async (data) => {
-    return request('admin/service-category/sys/remove', { data });
+  remove: async (id) => {
+    return request(`/api/item/category/${id}`, {
+      method: 'DELETE',
+    });
   },
 };
 export default ServiceCategoryApi;

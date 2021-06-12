@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import MaterialPicker from '@/components/MaterialPicker';
 import { PictureOutlined } from '@ant-design/icons';
@@ -22,7 +22,7 @@ const editorProps = {
 };
 const MyEditor = props => {
 
-  const [editorState, setEditorState] = useControllableValue(props, { defaultValue: [] });
+  const [editorState, setEditorState] = useControllableValue(props, { defaultValue: null });
 
   const insertPic = pics => {
     setEditorState(ContentUtils.insertMedias(editorState, pics.map(url => ({
@@ -35,19 +35,19 @@ const MyEditor = props => {
     setEditorState(e);
   };
 
-  return <BraftEditor {...editorProps} value={editorState} onBlur={onBlur}
+  return <BraftEditor {...editorProps} value={editorState} onChange={onBlur}
                       extendControls={[{
                         key: 'material',
                         type: 'button',
                         text: <MaterialPicker customRender={customProps => <PictureOutlined {...customProps} />}
                                               mode={'multi'} maxCount={100}
-                                              onChange={insertPic} destroyOnClose/>,
+                                              onChange={insertPic} destroyOnClose />,
                       }]}
   />;
 };
 
 MyEditor.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.object,
   onChange: PropTypes.func,
 };
 

@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Menu, Spin } from 'antd';
+import { Menu, Space, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import LoginApi from '@/services/login';
+import moment from 'moment';
 
 
 /**
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await LoginApi.logout();
+  localStorage.removeItem('token');
   const { query = {}, pathname } = history.location;
   const { redirect } = query;
   if (window.location.pathname !== '/user/login' && !redirect) {
@@ -59,26 +59,20 @@ const AvatarDropdown = ({ menu }) => {
 
   const { userInfo } = initialState;
 
-  if (!userInfo || !userInfo.username) {
+  if (!userInfo || !userInfo.mobile) {
     return loading;
   }
-
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-      {menu && (
-        <Menu.Item key='center'>
-          <UserOutlined />
-          个人中心
-        </Menu.Item>
-      )}
-      {menu && (
-        <Menu.Item key='settings'>
-          <SettingOutlined />
-          个人设置
-        </Menu.Item>
-      )}
-      {menu && <Menu.Divider />}
-
+      <Menu.Item key='center'>
+        <UserOutlined />
+        个人中心
+      </Menu.Item>
+      <Menu.Item key='settings'>
+        <SettingOutlined />
+        个人设置
+      </Menu.Item>
+      <Menu.Divider />
       <Menu.Item key='logout'>
         <LogoutOutlined />
         退出登录
@@ -87,9 +81,12 @@ const AvatarDropdown = ({ menu }) => {
   );
   return (
     <HeaderDropdown overlay={menuHeaderDropdown}>
-      <span className={`${styles.action} ${styles.account}`}>
-        <span className={`${styles.name} anticon`}>{userInfo.username}</span>
-      </span>
+              <span className={`${styles.action} ${styles.account}`}>
+      <Space size={'small'}>
+        <span>有效期: {userInfo.expireDate ? moment(userInfo.expireDate).format('YYYY-MM-DD') : '永久'}</span>
+        <span>{userInfo.brand}</span>
+      </Space>
+                   </span>
     </HeaderDropdown>
   );
 };

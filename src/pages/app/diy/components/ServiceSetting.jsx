@@ -1,9 +1,10 @@
 import React from 'react';
-import ProForm, { ProFormDependency, ProFormRadio, ProFormSlider } from '@ant-design/pro-form';
+import ProForm, { ProFormDependency, ProFormRadio, ProFormSlider, ProFormText } from '@ant-design/pro-form';
 import PaddingGroup from '@/pages/app/diy/components/PaddingGroup';
 import { Button } from 'antd';
 import ServicePicker from '@/components/ServicePicker';
 import { useBoolean } from 'ahooks';
+import ColorPicker from '@/components/ColorPicker';
 
 
 const PrivateServicePicker = ({ value, onChange }) => {
@@ -18,7 +19,7 @@ const PrivateServicePicker = ({ value, onChange }) => {
   return <>
     <ServicePicker visible={serviceVisible} value={value?.map(_id => ({ _id }))} onChange={onChooseService}
                    onCancel={toggleServiceVisible.setFalse} />
-    <Button type={'primary'} style={{width:150}}
+    <Button type={'primary'} style={{ width: 150 }}
             onClick={toggleServiceVisible.setTrue}>选择{value?.length ? `(已选${value?.length}项)` : ''}</Button>
   </>;
 
@@ -81,8 +82,14 @@ const ServiceSetting = props => {
           </ProForm.Item>;
         }}
       </ProFormDependency>
-
       <br />
+      <ProForm.Item name='themeColor' label={'主题色'}>
+        <ColorPicker allowTrans={false} />
+      </ProForm.Item>
+      <ProForm.Item name='btnColor' label={'按钮文字色'}>
+        <ColorPicker allowTrans={false} />
+      </ProForm.Item>
+      <ProFormText name='btnText' label={'按钮文字'} />
     </ProForm.Group>
 
     <PaddingGroup max={100} />

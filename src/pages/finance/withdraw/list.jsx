@@ -29,38 +29,39 @@ const WithdrawList = () => {
   const columns = [
     {
       title: '提现用户',
-      dataIndex: 'userInfo',
+      dataIndex: 'nickname',
       align: 'center',
       width: 200,
       formItemProps:{
         name:'user'
       },
-      render: userInfo => {
+      render: (_,{nickname,avatar,mobile}) => {
         return <Space>
-          <Avatar src={userInfo.avatar} />
+          <Avatar src={avatar} />
           <Space direction={'vertical'}>
-            <b>{userInfo.nickname}</b>
-            <span>{userInfo.mobile}</span>
+            <b>{nickname}</b>
+            <span>{mobile}</span>
           </Space>
         </Space>;
       },
     },
     {
       title: '提现单号',
-      dataIndex: 'withdraw_no',
+      dataIndex: 'withdrawNo',
       width: 200,
       align: 'center',
     },
     {
       title: '申请时间',
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
       align: 'center',
       width: 200,
       hideInSearch: true,
     },
     {
       title: '提现金额',
-      dataIndex: 'withdraw_money',
+      dataIndex: 'withdrawMoney',
       align: 'center',
       width: 200,
       valueType: 'money',
@@ -76,23 +77,16 @@ const WithdrawList = () => {
         buttonStyle: 'solid',
       },
       valueEnum: Enums.withdrawState,
-      render: (it, { reject_reason }) => {
+      render: (it, { rejectReason }) => {
         return <Space size={'small'} direction={'vertical'}>
           {it}
-          {reject_reason && <span style={{ fontSize: 8 }}>{reject_reason}</span>}
+          {rejectReason && <span style={{ fontSize: 8 }}>{rejectReason}</span>}
         </Space>;
       },
     },
     {
-      title: '处理时间',
-      dataIndex: '_add_time_str',
-      align: 'center',
-      width: 200,
-      hideInSearch: true,
-    },
-    {
       title: '审核时间',
-      dataIndex: 'check_time',
+      dataIndex: 'checkTime',
       valueType: 'dateTime',
       align: 'center',
       width: 200,
@@ -100,7 +94,7 @@ const WithdrawList = () => {
     },
     {
       title: '转账时间',
-      dataIndex: 'trans_time',
+      dataIndex: 'transTime',
       valueType: 'dateTime',
       align: 'center',
       width: 200,
@@ -141,7 +135,7 @@ const WithdrawList = () => {
         actionRef={tableRef}
         size={'small'}
         request={WithdrawApi.page}
-        rowKey='_id'
+        rowKey='id'
         columns={columns}
         scroll={{x:1000}}
       />

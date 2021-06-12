@@ -1,17 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ModalForm, ProFormSelect } from '@ant-design/pro-form';
+import { ModalForm } from '@ant-design/pro-form';
 import { Form } from 'antd';
-import CouponApi from '@/services/promotion/coupon';
-import Enums from '@/utils/enums';
 import MemberApi from '@/services/member';
 import CouponSelect from '@/components/CouponSelect';
 
-const SendCoupon = ({ userId, visible, onVisibleChange, onFinish }) => {
+const SendCoupon = ({ memberId, visible, onVisibleChange, onFinish }) => {
   const [form] = Form.useForm();
 
   const onSubmit = async ({ couponId }) => {
-    await MemberApi.sendCoupon({ userId, couponId });
+    await MemberApi.sendCoupon(memberId,couponId);
     return onFinish();
   };
   return (
@@ -29,7 +27,7 @@ const SendCoupon = ({ userId, visible, onVisibleChange, onFinish }) => {
 };
 
 SendCoupon.propTypes = {
-  userId: PropTypes.string,
+  memberId: PropTypes.string,
   visible: PropTypes.bool.isRequired,
   onFinish: PropTypes.func.isRequired,
   onVisibleChange: PropTypes.func.isRequired,

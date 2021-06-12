@@ -29,6 +29,7 @@ const PreviewImage = ({ size, src, onRemove }) => {
 
 const MaterialPicker = props => {
 
+
   const listRef = useRef();
 
   const [visible, toggleVisible] = useBoolean(false);
@@ -37,7 +38,10 @@ const MaterialPicker = props => {
   const [checkItems, setCheckItems] = useState([]);
   const [currentKey, setCurrentKey] = useState('all');
 
-  const pageMaterial = (page) => MaterialApi.page({ ...page, category: currentKey === 'all' ? null : currentKey });
+  const pageMaterial = (page) => MaterialApi.page({
+    ...page,
+    condition: { categoryId: currentKey === 'all' ? null : currentKey },
+  });
 
   useEffect(() => {
     listRef?.current?.reset();
@@ -56,8 +60,9 @@ const MaterialPicker = props => {
       } else {
         setCheckItems(props.value);
       }
+    }else{
+      setCheckItems([]);
     }
-    setCheckItems([]);
   }, [props.value]);
 
   const categoryTabs = useMemo(() => {
@@ -65,10 +70,10 @@ const MaterialPicker = props => {
       tab: '默认分类',
       key: 'all',
     }];
-    listCategoryRequest.data?.forEach(({ name, _id }) => {
+    listCategoryRequest.data?.forEach(({ name, id }) => {
       tabs.push({
         tab: name,
-        key: _id,
+        key: id,
       });
     });
     return tabs;
@@ -109,7 +114,7 @@ const MaterialPicker = props => {
       setMaterialLoading(true);
       const fileUrl = await UploadUtil.uploadFile(file);
       await MaterialApi.add({
-        file_url: fileUrl,
+        fileUrl,
         name: file.name,
         category: currentKey === 'all' ? null : currentKey,
       });
@@ -126,7 +131,7 @@ const MaterialPicker = props => {
   const removeImage = idx => {
 
     if (typeof props.value === 'string') {
-      props.onChange(null);
+      props.onChange(undefined);
     } else {
       const newImages = [...props.value];
       newImages.splice(idx, 1);
@@ -190,8 +195,8 @@ const MaterialPicker = props => {
             }}
             grid={{ gutter: 16, column: 6, xs: 1, md: 3 }}
             request={pageMaterial}
-            renderItem={({ _id, file_url }) => <MaterialImage key={_id} checked={hasChecked(file_url)}
-                                                              onChange={checkMaterial} fileUrl={file_url} />}
+            renderItem={({ id, fileUrl }) => <MaterialImage key={id} checked={hasChecked(fileUrl)}
+                                                              onChange={checkMaterial} fileUrl={fileUrl} />}
           />
         </Card>
       </Modal>

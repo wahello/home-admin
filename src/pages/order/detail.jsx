@@ -16,7 +16,7 @@ import { useBoolean } from 'ahooks';
 import CancelOrderForm from '@/pages/order/components/CancelOrderForm';
 
 const payRecordColumns = [{
-  dataIndex: 'pay_no',
+  dataIndex: 'payNo',
   title: '支付流水号',
   copyable: true,
   width: 250,
@@ -31,8 +31,9 @@ const payRecordColumns = [{
     </Space>;
   },
 }, {
-  dataIndex: '_add_time_str',
+  dataIndex: 'createTime',
   title: '支付时间',
+  valueType: 'dateTime',
   width: 250,
 }, {
   dataIndex: 'fee',
@@ -55,13 +56,14 @@ const payRecordColumns = [{
   valueEnum: Enums.payState,
 }];
 const refundRecordColumns = [{
-  dataIndex: 'refund_no',
+  dataIndex: 'refundNo',
   title: '退款流水号',
   copyable: true,
   width: '20%',
 },
   {
-    dataIndex: '_add_time_str',
+    dataIndex: 'createTime',
+    valueType: 'dateTime',
     title: '退款时间',
     width: '20%',
   }, {
@@ -123,7 +125,7 @@ const adjustColumns = [{
 const OrderDetail = props => {
 
   const { id } = props.location.query;
-  const { data: order, loading, error, refresh } = useRequest(() => OrderApi.get({ id }));
+  const { data: order, loading, error, refresh } = useRequest(() => OrderApi.get(id));
   const actionRef = useRef();
   const [adjustItemForm] = Form.useForm();
 
@@ -135,7 +137,7 @@ const OrderDetail = props => {
 
   useEffect(() => {
     if (order) {
-      const dbAdjustItems = order.adjust_items || [];
+      const dbAdjustItems = order.adjustItems || [];
       setAdjustItems(dbAdjustItems);
       const orderState = Enums.orderState[order.state];
       if ([Enums.orderState.SERVICING, Enums.orderState.WAIT_PAY_AFTER].includes(orderState)) {
@@ -151,12 +153,12 @@ const OrderDetail = props => {
       editable: false,
     },
     {
-      dataIndex: ['service', 'sku','name'],
+      dataIndex: ['sku', 'name'],
       title: '服务规格',
       editable: false,
     },
     {
-      dataIndex: ['service', 'sku','num'],
+      dataIndex: 'num',
       title: '数量',
       editable: false,
     },
@@ -171,15 +173,17 @@ const OrderDetail = props => {
         </Space>;
       },
     }, {
-      dataIndex: '_add_time_str',
+      dataIndex: 'createTime',
       title: '下单时间',
+      valueType: 'dateTime',
       editable: false,
     }, {
-      dataIndex: 'appoint_time',
+      dataIndex: 'appointTime',
       title: '预约时间',
+      valueType: 'dateTime',
       editable: false,
     }, {
-      dataIndex: ['address', 'name'],
+      dataIndex: ['address', 'contract'],
       title: '联系人',
       formItemProps: {
         rules: [{ required: true, message: '不能为空' }],
@@ -203,7 +207,7 @@ const OrderDetail = props => {
       editable: false,
       span: 3,
     }, {
-      dataIndex: 'shop_remark',
+      dataIndex: 'shopRemark',
       title: '订单备注',
 
       span: 3,
@@ -211,11 +215,11 @@ const OrderDetail = props => {
 
 
   const onUpdateOrder = async (key, values) => {
-    const { address, shop_remark } = values;
+    const { address, shopRemark } = values;
     await OrderApi.updateAddress({
       id,
       address,
-      shop_remark,
+      shopRemark,
     });
     refresh();
   };
@@ -283,7 +287,7 @@ const OrderDetail = props => {
   };
 
   const openPayOffline = () => {
-    if (order.actual_fee - order.paid_fee <= 0) {
+    if (order.actualFee - order.paidFee <= 0) {
       message.warning('订单已无待支付金额');
     } else {
       togglePayOfflineVisible.setTrue();
@@ -298,7 +302,7 @@ const OrderDetail = props => {
     }
     Modal.confirm({
       title: '取消订单提示',
-      content:'请确保与客户沟通好取消，以免造成客户的误解以及不必要的纠纷',
+      content: '请确保与客户沟通好取消，以免造成客户的误解以及不必要的纠纷',
       okText: '确认取消',
       okType: 'primary',
       okButtonProps: { danger: true },
@@ -314,11 +318,18 @@ const OrderDetail = props => {
   const renderExtra = useMemo(() => {
     if (order) {
       const orderState = Enums.orderState[order.state];
-      const canConfirm = orderState === Enums.orderState.WAIT_CONFIRM;
+      const orderType = Enums.orderType[order.orderType];
+      let canConfirm = orderState === Enums.orderState.WAIT_CONFIRM;
+      let canClose = [Enums.orderState.WAIT_PAY, Enums.orderState.WAIT_PAY_PART, Enums.orderState.WAIT_CONFIRM, Enums.orderState.WAIT_SERVICE, Enums.orderState.SERVICING, Enums.orderState.CLOSING].includes(orderState);
+      if (orderType === Enums.orderType.GROUP) {
+        if (order.groupJoin?.groupRecord?.state === Enums.groupRecordState.PROCESSING.value) {
+          canConfirm = false;
+          canClose = false;
+        }
+      }
       const canService = orderState === Enums.orderState.WAIT_SERVICE;
       const canServiceEnd = orderState === Enums.orderState.SERVICING;
       const canPayOffline = orderState === Enums.orderState.WAIT_PAY_AFTER;
-      const canClose = [Enums.orderState.WAIT_PAY, Enums.orderState.WAIT_PAY_PART, Enums.orderState.WAIT_CONFIRM, Enums.orderState.WAIT_SERVICE, Enums.orderState.SERVICING, Enums.orderState.CLOSING].includes(orderState);
       return <Space>
         {canConfirm && <Button type={'primary'} onClick={confirmService}>确认订单</Button>}
         {canService && <Button type={'primary'} onClick={startService}>开始服务订单</Button>}
@@ -355,14 +366,16 @@ const OrderDetail = props => {
       </ProCard> : loading ? <>
           <ProCard><Skeleton /></ProCard><br /><ProCard><Skeleton /></ProCard><br /><ProCard><Skeleton /></ProCard></> :
         <>
-          <ProCard title={<Space><span>单号: {order.order_no}</span>{order.type!==Enums.orderType.NORMAL.value&&<Tag
-            color={Enums.orderType[order.type]?.color}>{Enums.orderType[order.type]?.text}</Tag>}</Space>} extra={
-            <span style={{ fontSize: 20, fontWeight: 'bold' }}>
+          <ProCard
+            title={<Space><span>单号: {order.orderNo}</span>{order.orderType !== Enums.orderType.NORMAL.value && <Tag
+              color={Enums.orderType[order.orderType]?.color}>{Enums.orderType[order.orderType]?.text}</Tag>}</Space>}
+            extra={
+              <span style={{ fontSize: 20, fontWeight: 'bold' }}>
               {Enums.orderState[order.state].text}
-              {order.group_record.state && <span
-                style={{ color: Enums.groupRecordState[order.group_record.state].color }}>({Enums.groupRecordState[order.group_record.state].text})</span>}
+                {order.groupJoin?.groupRecord?.state && <span
+                  style={{ color: Enums.groupRecordState[order.groupJoin.groupRecord.state].color }}>({Enums.groupRecordState[order.groupJoin.groupRecord.state].text})</span>}
             </span>
-          }>
+            }>
             <Row>
               <Col span={18}>
                 <ProDescriptions
@@ -376,18 +389,18 @@ const OrderDetail = props => {
               </Col>
               <Col span={3} offset={3}>
                 <ProDescriptions column={1}>
-                  <ProDescriptions.Item valueType={'money'} label={'订单原价'}>{order.service_fee}</ProDescriptions.Item>
-                  <ProDescriptions.Item valueType={'money'} label={'优惠金额'}>{order.coupon_fee}</ProDescriptions.Item>
-                  <ProDescriptions.Item valueType={'money'} label={'附加款项'}>{order.adjust_fee}</ProDescriptions.Item>
-                  <ProDescriptions.Item valueType={'money'} label={'实际金额'}>{order.actual_fee}</ProDescriptions.Item>
-                  <ProDescriptions.Item valueType={'money'} label={'已付金额'}>{order.paid_fee}</ProDescriptions.Item>
+                  <ProDescriptions.Item valueType={'money'} label={'订单原价'}>{order.totalFee}</ProDescriptions.Item>
+                  <ProDescriptions.Item valueType={'money'} label={'优惠金额'}>{order.couponFee}</ProDescriptions.Item>
+                  <ProDescriptions.Item valueType={'money'} label={'附加款项'}>{order.adjustFee}</ProDescriptions.Item>
+                  <ProDescriptions.Item valueType={'money'} label={'实际金额'}>{order.actualFee}</ProDescriptions.Item>
+                  <ProDescriptions.Item valueType={'money'} label={'已付金额'}>{order.paidFee}</ProDescriptions.Item>
                 </ProDescriptions>
               </Col>
             </Row>
           </ProCard>
 
           <br />
-          <ProCard title={'支付记录'} subTitle={'(由于支付商到账通知有延时,用户支付成功的订单状态更新可能会出现稍许延迟)'}>
+          <ProCard title={'支付记录'} subTitle={'(由于支付平台到账通知有延时,用户支付成功的订单状态更新可能会出现稍许延迟)'}>
             <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'_id'} toolbar={false}
                       scroll={{ y: 300 }}
                       options={false} pagination={false}
@@ -418,7 +431,7 @@ const OrderDetail = props => {
           </ProCard>
           <br />
 
-          <ProCard title={'退款记录'} subTitle={'(由于支付商退款有延时,退款中的状态更新会有些许延迟)'}>
+          <ProCard title={'退款记录'} >
             <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'_id'} toolbar={false}
                       options={false} pagination={false}
                       dataSource={order?.refund_records}

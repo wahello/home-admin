@@ -1,9 +1,7 @@
 import { request } from 'umi';
 
 const OrderApi = {
-  add: async (data) => {
-    return request('admin/order/sys/add', { data });
-  },
+
   updateAddress: async (data) => {
     return request('admin/order/sys/updateAddress', { data });
   },
@@ -20,10 +18,13 @@ const OrderApi = {
     return request('admin/order/sys/payOffline', { data });
   },
   page: async (data) => {
-    return request('admin/order/sys/page',{data});
+    return request('/api/order/single/page',{
+      method: 'POST',
+      data
+    });
   },
-  get: async (data) => {
-    return request('admin/order/sys/get', { data });
+  get: async (orderId) => {
+    return request(`/api/order/single/${orderId}`);
   },
   saveAdjustItems: async (data) => {
     return request('admin/order/sys/saveAdjustItems', { data });

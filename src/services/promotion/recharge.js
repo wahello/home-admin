@@ -11,7 +11,10 @@ const RechargeApi = {
     return request('admin/promotion/recharge/sys/page',{data});
   },
   pageRecord: async (data) => {
-    return request('admin/promotion/recharge/sys/pageRecord',{data});
+    return request('/api/recharge/pageRecord',{
+      method: 'POST',
+      data
+    });
   },
   get: async (data) => {
     return request('admin/promotion/recharge/sys/get', { data });

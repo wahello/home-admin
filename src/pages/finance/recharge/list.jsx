@@ -7,24 +7,24 @@ import { Avatar, Space, Tag } from 'antd';
 const recordColumns = [
   {
     title: '充值用户',
-    dataIndex: 'userInfo',
+    dataIndex: 'nickname',
     formItemProps: {
       name: 'user',
     },
     align: 'center',
-    render: userInfo => {
+    render: (_,{nickname,avatar,mobile}) => {
       return <Space>
-        <Avatar src={userInfo.avatar} />
+        <Avatar src={avatar} />
         <Space direction={'vertical'}>
-          <b>{userInfo.nickname}</b>
-          <span>{userInfo.mobile}</span>
+          <b>{nickname}</b>
+          <span>{mobile}</span>
         </Space>
       </Space>;
     },
   },
   {
     title: '充值单号',
-    dataIndex: 'recharge_no',
+    dataIndex: 'rechargeNo',
     width: 200,
     align: 'center',
   },
@@ -34,6 +34,7 @@ const recordColumns = [
     align: 'center',
     valueType: 'select',
     valueEnum: Enums.payChannel,
+    hideInSearch: true,
     render: (_, entity) => {
       const payChannel = Enums.payChannel[entity.channel];
       return payChannel ? <Space size={'small'}>
@@ -52,26 +53,26 @@ const recordColumns = [
   },
   {
     title: '赠送余额',
-    dataIndex: 'send_balance',
+    dataIndex: 'sendBalance',
     align: 'center',
     valueType: 'money',
     hideInSearch: true,
   },
   {
     title: '赠送积分',
-    dataIndex: 'send_integral',
+    dataIndex: 'sendIntegral',
     align: 'center',
     hideInSearch: true,
   },
   {
     title: '赠送优惠券',
-    dataIndex: 'send_coupons',
+    dataIndex: 'sendCoupons',
     width: 200,
     align: 'center',
     hideInSearch: true,
-    render: it => {
-      return it.length ?
-        <Space direction={'vertical'}>{it.map(coupon => <Tag color={'blue'}>{coupon.name}</Tag>)}</Space> : '-';
+    render: (_,{sendCouponNames}) => {
+      return sendCouponNames ?
+        <Space direction={'vertical'}>{sendCouponNames.map(name => <Tag color={'blue'}>{name}</Tag>)}</Space> : '-';
     },
   },
   {
@@ -83,7 +84,8 @@ const recordColumns = [
   },
   {
     title: '充值时间',
-    dataIndex: '_add_time_str',
+    dataIndex: 'createTime',
+    valueType: 'dateTime',
     align: 'center',
     hideInSearch: true,
   },
@@ -93,11 +95,12 @@ const RechargeList = () => {
   return (
     <ProTable
       search={{
-        collapseRender:false
+        collapseRender: false,
+        defaultCollapsed: false,
       }}
       size={'small'}
       request={RechargeApi.pageRecord}
-      rowKey='_id'
+      rowKey='id'
       columns={recordColumns}
     />
   );

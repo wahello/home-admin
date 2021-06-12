@@ -18,7 +18,7 @@ const GiftForm = ({ gift, visible, onVisibleChange, onFinish }) => {
 
   const onSubmit = async values => {
     if (gift) {
-      onFinish({ ...values, id: gift.id });
+      onFinish({ ...gift,...values });
     } else {
       onFinish(values);
     }
@@ -28,7 +28,9 @@ const GiftForm = ({ gift, visible, onVisibleChange, onFinish }) => {
     <ModalForm form={form} width={500} title={gift ? '修改奖品' : '添加奖品'} visible={visible} layout={'horizontal'}
                labelCol={{ span: 6 }} wrapperCol={{ span: 14 }}
                onVisibleChange={onVisibleChange}
-               onFinish={onSubmit}>
+               onFinish={onSubmit}
+               modalProps={{destroyOnClose:true}}
+    >
 
       <ProFormText
         width='md'
@@ -38,13 +40,18 @@ const GiftForm = ({ gift, visible, onVisibleChange, onFinish }) => {
         fieldProps={{ maxLength: 6 }}
         rules={[{ required: true }]}
       />
-      <ProFormRadio.Group
-        name='type'
-        initialValue={Enums.giftType.COUPON.value}
-        label='奖励类型'
-        rules={[{ required: true }]}
-        options={Object.values(Enums.giftType).map(({ text, value }) => ({ label: text, value }))}
-      />
+      {
+        gift?.id !== 1 && <ProFormRadio.Group
+          name='type'
+          initialValue={Enums.giftType.COUPON.value}
+          label='奖励类型'
+          rules={[{ required: true }]}
+          options={Object.values(Enums.giftType).filter(it => it.value !== 'NONE').map(({
+                                                                                          text,
+                                                                                          value,
+                                                                                        }) => ({ label: text, value }))}
+        />
+      }
       <ProFormDependency name={['type']}>
         {
           ({ type }) => {
@@ -72,12 +79,20 @@ const GiftForm = ({ gift, visible, onVisibleChange, onFinish }) => {
       <ProForm.Item label={'奖品图片'} name={'pic'} rules={[{ required: true, message: '请选择奖品图片' }]}>
         <MaterialPicker />
       </ProForm.Item>
+      <ProFormText
+        width='md'
+        name='tip'
+        label='中奖提示'
+        placeholder='请输入中奖提示'
+        rules={[{ required: true }]}
+      />
       <ProFormDigit
         fieldProps={{ precision: 0 }}
         width='xs'
         name='weight'
         label='奖项权重'
         initialValue={1}
+        min={1}
         rules={[{ required: true, message: '请输入奖项权重' }]}
       />
 

@@ -23,12 +23,14 @@ const AlbumManage = () => {
   const [currentKey, setCurrentKey] = useState('all');
   const [addMaterialLoading, setMaterialLoading] = useState(false);
   const listCategoryRequest = useRequest(MaterialCategoryApi.list);
-  const [hasCheckedAll,toggleHasCheckedAll] = useBoolean(false)
+  const [hasCheckedAll, toggleHasCheckedAll] = useBoolean(false);
 
   const pageRequest = useRequest(({ current, pageSize }) => MaterialApi.page({
     current,
     pageSize,
-    category: currentKey === 'all' ? null : currentKey,
+    condition: {
+      categoryId: currentKey === 'all' ? null : currentKey,
+    },
   }), {
     paginated: true,
     defaultPageSize: 12,
@@ -42,10 +44,10 @@ const AlbumManage = () => {
       name: '默认分组',
       key: 'all',
     }];
-    listCategoryRequest.data?.forEach(({ name, _id }) => {
+    listCategoryRequest.data?.forEach(({ name, id }) => {
       result.push({
         name,
-        key: _id,
+        key: id,
       });
     });
     return result;
@@ -89,12 +91,12 @@ const AlbumManage = () => {
     try {
       const fileUrl = await UploadUtil.uploadFile(file);
       await MaterialApi.add({
-        file_url: fileUrl,
+        fileUrl,
         name: file.name,
-        category: currentKey === 'all' ? null : currentKey,
+        categoryId: currentKey === 'all' ? null : currentKey,
       });
       onSuccess(fileUrl);
-      pageRequest.run({ current:1, pageSize:12 })
+      pageRequest.run({ current: 1, pageSize: 12 });
     } catch (e) {
       message.error(e.message);
       onError(e, file);
@@ -111,7 +113,7 @@ const AlbumManage = () => {
       content: '仅删除分组，不删除图片，分组内图片将自动归入默认分组',
       centered: true,
       onOk: async () => {
-        await MaterialCategoryApi.remove({ id: currentKey });
+        await MaterialCategoryApi.remove(currentKey);
         message.success('删除成功');
         listCategoryRequest.refresh();
         setCurrentKey('all');
@@ -121,7 +123,7 @@ const AlbumManage = () => {
   const removeMaterial = async (id) => {
     const hide = message.loading('正在删除');
     try {
-      await MaterialApi.remove({ ids:[id] });
+      await MaterialApi.remove([id]);
       message.success('删除成功');
       pageRequest.refresh();
     } catch (e) {
@@ -138,52 +140,52 @@ const AlbumManage = () => {
   const changeCategory = async ({ category }) => {
     await MaterialApi.move({
       ids: moveData.ids,
-      category: category === 'all' ? null : category,
+      categoryId: category === 'all' ? null : category,
     });
     setMoveData(null);
-    pageRequest.refresh()
+    pageRequest.refresh();
     return true;
   };
 
 
   useEffect(() => {
-    if (checkItems.length === pageRequest?.data?.list.length) {
+    if (checkItems.length&&checkItems.length === pageRequest?.data?.list.length) {
       toggleHasCheckedAll.setTrue();
     } else {
       toggleHasCheckedAll.setFalse();
     }
   }, [checkItems]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setCheckItems([]);
     toggleHasCheckedAll.setFalse();
-  },[pageRequest.data])
+  }, [pageRequest.data]);
 
 
-  const checkAllChange=(e)=>{
+  const checkAllChange = (e) => {
     const value = e.target.checked;
     if (value) {
-      setCheckItems(pageRequest.data?.list?.map(it=>it.file_url))
-    }else{
-      setCheckItems([])
+      setCheckItems(pageRequest.data?.list?.map(it => it.fileUrl));
+    } else {
+      setCheckItems([]);
     }
-    toggleHasCheckedAll.toggle(value)
-  }
+    toggleHasCheckedAll.toggle(value);
+  };
 
 
-  const batchRemove= ()=>{
+  const batchRemove = () => {
     Modal.confirm({
       title: '确认删除?',
       centered: true,
-      okButtonProps:{
+      okButtonProps: {
         type: 'primary',
         danger: true,
       },
-      onOk:async ()=>{
+      onOk: async () => {
         const hide = message.loading('正在删除');
-        const checkIds = pageRequest?.data?.list.filter(it=>checkItems.includes(it.file_url)).map(it=>it._id)
+        const checkIds = pageRequest?.data?.list.filter(it => checkItems.includes(it.fileUrl)).map(it => it.id);
         try {
-          await MaterialApi.remove({ ids:checkIds });
+          await MaterialApi.remove(checkIds);
           message.success('删除成功');
           pageRequest.refresh();
         } catch (e) {
@@ -191,16 +193,16 @@ const AlbumManage = () => {
         } finally {
           hide();
         }
-      }
-    })
-  }
-  const batchMove= ()=>{
-    setMoveData({
-      ids: pageRequest?.data?.list.filter(it => checkItems.includes(it.file_url)).map(it => it._id),
-      category: currentKey,
+      },
     });
-    setChangeCategoryVisible(true)
-  }
+  };
+  const batchMove = () => {
+    setMoveData({
+      ids: pageRequest?.data?.list.filter(it => checkItems.includes(it.fileUrl)).map(it => it.id),
+      categoryId: currentKey,
+    });
+    setChangeCategoryVisible(true);
+  };
 
   return (
     <PageContainer>
@@ -235,19 +237,19 @@ const AlbumManage = () => {
 
               <Row gutter={16}>
                 {pageRequest.data?.list.map(it => {
-                  return <Col key={it._id} xs={24} md={8} lg={4}>
+                  return <Col key={it.id} xs={24} md={8} lg={4}>
                     <Space direction={'vertical'}>
-                      <MaterialImage  checked={hasChecked(it.file_url)}
-                                      onChange={checkMaterial} fileUrl={it.file_url} />
+                      <MaterialImage checked={hasChecked(it.fileUrl)}
+                                     onChange={checkMaterial} fileUrl={it.fileUrl} />
                       <div style={{ textAlign: 'center' }}>
                         <Space size={'small'}>
-                          <a onClick={() => window.open(it.file_url)}>查看</a>
-                          <a onClick={() => copyUrl(it.file_url)}>链接</a>
+                          <a onClick={() => window.open(it.fileUrl)}>查看</a>
+                          <a onClick={() => copyUrl(it.fileUrl)}>链接</a>
                           <a onClick={() => {
-                            setMoveData({ ids:[it._id],category:it.category });
+                            setMoveData({ ids: [it.id], category: it.category });
                             setChangeCategoryVisible(true);
                           }}>分组</a>
-                          <Popconfirm title={'确认删除?'} onConfirm={() => removeMaterial(it._id)}
+                          <Popconfirm title={'确认删除?'} onConfirm={() => removeMaterial(it.id)}
                                       okButtonProps={{ type: 'primary', danger: true }}>
                             <a>删除</a>
                           </Popconfirm>

@@ -8,7 +8,7 @@
 export default {
   dev: {
     '/api/': {
-      target: 'http://cloud.anjujing.cn/http/http/route',
+      target: 'http://localhost:8080',
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },

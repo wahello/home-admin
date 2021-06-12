@@ -16,7 +16,7 @@ import MaterialPicker from '@/components/MaterialPicker';
 const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId }) => {
   const [form] = Form.useForm();
   const { data, loading, error } = useRequest(() => {
-    return id ? ServiceCategoryApi.get({ id }) : Promise.resolve({});
+    return id ? ServiceCategoryApi.get(id) : Promise.resolve({});
   }, {
     refreshDeps: [id],
   });
@@ -33,7 +33,7 @@ const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId 
 
   useEffect(() => {
     form.setFieldsValue({
-      parent_id: parentId,
+      parentId,
     });
   }, [parentId]);
 
@@ -60,16 +60,16 @@ const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId 
       <Spin spinning={loading}>
         {(!id||(!id&&!data?.parent_id))&&<ProFormSelect
           width='md'
-          name='parent_id'
+          name='parentId'
           label='上级分类'
           placeholder='请选择上级分类'
           extra={!parentId && '留空为一级分类'}
           readonly={!!parentId}
           request={async () => {
             const { data: categoryList } = await ServiceCategoryApi.list();
-            return categoryList?.map(({ _id, name }) => ({
-              value: _id,
-              label: name,
+            return categoryList?.map((cat) => ({
+              value: cat.id,
+              label: cat.name,
             }));
           }}
         />}
@@ -88,17 +88,17 @@ const ServiceCategoryForm = ({ id, visible, onVisibleChange, onFinish, parentId 
           extra={'数字越大越靠前显示'}
           initialValue={0}
         />
-        <ProFormDependency name={['parent_id']}>
+        <ProFormDependency name={['parentId']}>
           {
-            ({ parent_id }) => {
-              return parent_id && <ProForm.Item name={'pic'} label={'分类图标'} rules={[{ required: true }]}>
+            ({ parentId }) => {
+              return parentId && <ProForm.Item name={'pic'} label={'分类图标'} rules={[{ required: true }]}>
                 <MaterialPicker />
               </ProForm.Item>;
             }
           }
         </ProFormDependency>
         <ProFormSwitch
-          name='show'
+          name='showFlag'
           label='是否显示'
           initialValue={true}
         />
