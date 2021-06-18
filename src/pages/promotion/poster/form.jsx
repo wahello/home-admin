@@ -76,9 +76,6 @@ const PosterForm = props => {
                          submitText: '保存',
                        },
                        render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
-                       submitButtonProps: {
-                         size: 'large',
-                       },
                      }}>
               <ProFormText
                 name='name'

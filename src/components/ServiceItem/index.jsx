@@ -2,7 +2,7 @@ import styles from '@/pages/order/index.less';
 import { Image } from 'antd';
 import React from 'react';
 
-const ServiceItem = ({ service, sku,num }) => {
+const ServiceItem = ({ service, sku }) => {
   return <div className={styles.service}>
     <Image width={60} height={60} src={service.mainPic} />
     <div className={styles.info}>
@@ -12,7 +12,7 @@ const ServiceItem = ({ service, sku,num }) => {
       </div>
       <div>
         <span>{sku.name}</span>
-        <span>{num||sku.num}{sku.unit}</span>
+        <span>{sku.num}{sku.unit}</span>
       </div>
     </div>
   </div>;

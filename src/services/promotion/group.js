@@ -23,7 +23,7 @@ const GroupApi = {
     });
   },
   pageRecord: async (data) => {
-    return request('/api/group-record/page', { method: 'POST', data });
+    return request('/api/group/pageRecord', { method: 'POST', data });
   },
   get: async (id) => {
     return request(`/api/group/${id}`);

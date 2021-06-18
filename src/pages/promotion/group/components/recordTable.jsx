@@ -10,37 +10,32 @@ import { history } from 'umi';
 
 const expandedRowRender = row => {
   const { joins } = row;
-  const dataSource = joins.map((join) => {
-    return {
-      ...join,
-      sku: join.order.service?.sku,
-    };
-  });
+  const dataSource = joins
   return <ProCard>
     <ProTable size={'small'}
               columns={[
-                {
-                  title: '用户信息',
-                  dataIndex: 'userInfo',
-                  render: ({ avatar, nickname, mobile }, { is_virtual, is_master }) => {
-                    if (is_virtual) {
+                { 
+                  title: '会员信息',
+                  dataIndex: 'nickname',
+                  render: (_,{ avatar, nickname, mobile,isVirtual, isMaster }) => {
+                    if (isVirtual) {
                       return <Space size={'small'}><Avatar /><span>虚拟用户</span></Space>;
                     }
                     return <Space size={'small'}><Avatar src={avatar} /><Space size={'small'}
-                                                                               direction={'vertical'}><b>{nickname} {is_master &&
+                                                                               direction={'vertical'}><b>{nickname} {isMaster &&
                     <Tag color={'blue'}>团主</Tag>}</b><span>{mobile}</span></Space></Space>;
                   },
                 },
                 {
                   title: '服务规格',
-                  dataIndex: 'sku',
-                  render: (sku) => {
-                    if (sku) {
+                  dataIndex: 'orderSku',
+                  render: (_,{orderSku}) => {
+                    if (orderSku) {
                       return <Space size={'small'}>
-                        <Image src={sku.pic} width={50} height={50} preview={{ mask: false }} />
+                        <Image src={orderSku.pic} width={50} height={50} preview={{ mask: false }} />
                         <Space size={'small'} direction={'vertical'}>
-                          <span>名称：{sku.name}</span>
-                          <span>数量：{sku.num}</span>
+                          <span>名称：{orderSku.name}</span>
+                          <span>数量：{orderSku.num}</span>
                         </Space>
                       </Space>;
                     }
@@ -49,22 +44,22 @@ const expandedRowRender = row => {
                 },
                 {
                   title: '订单金额',
-                  dataIndex: ['order', 'actual_fee'],
+                  dataIndex: 'orderFee',
                   valueType: 'money',
                 },
                 {
                   title: '订单状态',
-                  dataIndex: ['order', 'state'],
+                  dataIndex: 'orderState',
                   valueEnum: Enums.orderState,
                 },
                 {
                   title: '操作',
                   dataIndex: 'option',
                   valueType: 'option',
-                  render: (_, { order }) => {
+                  render: (_, { orderId }) => {
                     return <Space size={'small'}>
-                      <Button type={'link'} disabled={!order._id}
-                              onClick={() => history.push(`/order/detail?id=${order._id}`)}>查看订单</Button>
+                      <Button type={'link'} disabled={!orderId}
+                              onClick={() => history.push(`/order/detail?id=${orderId}`)}>查看订单</Button>
                     </Space>;
                   },
                 },
@@ -84,31 +79,31 @@ const RecordTable = () => {
 
   const columns = [
     {
-      dataIndex: ['group', 'name'],
+      dataIndex: 'groupName',
       title: '拼团名称',
     },
     {
-      dataIndex: ['group', 'service'],
+      dataIndex: 'service',
       title: '拼团商品',
       render: service => {
-        return <Space><Image src={service.main_pic} width={50} height={50}
+        return <Space><Image src={service.mainPic} width={50} height={50}
                              preview={{ mask: false }} /><span>{service.name}</span></Space>;
       },
     },
     {
-      dataIndex: '_add_time',
+      dataIndex: 'joinMin',
+      title: '成团人数/当前人数',
+      render: (_, { joinMin, joinNum }) => `${joinMin}/${joinNum}`,
+      hideInSearch: true,
+    },
+    {
+      dataIndex: 'createTime',
       title: '开团时间',
       valueType: 'dateTime',
       hideInSearch: true,
     },
     {
-      dataIndex: 'join_min',
-      title: '成团人数/当前人数',
-      render: (_, { join_min, join_num }) => `${join_min}/${join_num}`,
-      hideInSearch: true,
-    },
-    {
-      dataIndex: 'end_time',
+      dataIndex: 'endTime',
       title: '结束时间',
       valueType: 'dateTime',
       hideInSearch: true,
@@ -122,9 +117,9 @@ const RecordTable = () => {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, { _id }) => (<Space>
-        <Button type={'link'} icon={expandRowKey === _id ? <UpOutlined /> : <DownOutlined />}
-                onClick={() => setExpandRowKey(expandRowKey ? null : _id)}>查看参团人员</Button>
+      render: (_, { id }) => (<Space>
+        <Button type={'link'} icon={expandRowKey === id ? <UpOutlined /> : <DownOutlined />}
+                onClick={() => setExpandRowKey(expandRowKey ? null : id)}>查看参团人员</Button>
       </Space>),
     },
   ];
@@ -132,7 +127,7 @@ const RecordTable = () => {
   return <ProTable
     size={'small'}
     actionRef={tableRef} request={GroupApi.pageRecord} toolBarRender={() => []}
-    rowKey='_id'
+    rowKey='id'
     expandable={{
       expandedRowRender,
       expandedRowKeys: expandRowKey ? [expandRowKey] : null,

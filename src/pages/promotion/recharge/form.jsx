@@ -63,9 +63,6 @@ const RechargeForm = props => {
                          submitText: '保存',
                        },
                        render: (_, dom) => <div style={{ textAlign: 'center' }}>{dom.pop()}</div>,
-                       submitButtonProps: {
-                         size: 'large',
-                       },
                      }}>
               <ProFormDigit
                 name='money'

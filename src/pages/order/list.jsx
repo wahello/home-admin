@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Popconfirm, Space, Tag } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -7,21 +7,43 @@ import { history } from 'umi';
 import OrderApi from '@/services/order/order';
 import Enums from '@/utils/enums';
 import ServiceItem from '@/components/ServiceItem';
+import { useRequest } from 'umi';
 
 
-const stateTabs = [
-  {
-    tab: '全部',
-    key: 'all',
-  },
-  ...Object.values(Enums.orderState).map(({ text, value }) => ({ tab: text, key: value })),
-];
 
 
 const OrderList = props => {
 
   const tableRef = useRef();
   const [activeKey, setActiveKey] = useState();
+  const [stateTabs, setStateTabs] = useState([
+    {
+      tab: '全部(0)',
+      key: 'all',
+    },
+    ...Object.values(Enums.orderState).map(({ text, value }) => ({ tab: `${text}(0)`, key: value })),
+  ]);
+
+  const countRequest = useRequest(OrderApi.statisticsCount);
+
+  useEffect(() => {
+    if (countRequest.data) {
+      const stateList = countRequest.data;
+      const allCount = stateList.reduce((a, b) => a + b.count, 0);
+      setStateTabs(
+        [
+          {
+            tab: `全部(${allCount})`,
+            key: 'all',
+          },
+          ...Object.values(Enums.orderState).map(({ text, value }) => {
+            const count = stateList.find(it=>it.state===value)?.count||0
+            return { tab: `${text}(${count})`, key: value };
+          }),
+        ],
+      );
+    }
+  }, [countRequest.data]);
 
 
   const changeTab = key => {
@@ -36,7 +58,7 @@ const OrderList = props => {
   const pageRequest = params => {
     const pageParams = params;
     if (activeKey) {
-      pageParams.state = activeKey;
+      pageParams.states = [activeKey];
     }
     return OrderApi.page(pageParams);
   };
@@ -44,9 +66,10 @@ const OrderList = props => {
   const confirmOrder = async id => {
     const hide = message.loading('操作中');
     try {
-      await OrderApi.confirm({ id });
+      await OrderApi.confirm(id);
       message.success('操作成功');
       tableRef?.current?.reload();
+      countRequest.run()
     } catch (e) {
       console.log(e);
     } finally {
@@ -56,9 +79,10 @@ const OrderList = props => {
   const serviceOrder = async id => {
     const hide = message.loading('操作中');
     try {
-      await OrderApi.service({ id });
+      await OrderApi.service(id);
       message.success('操作成功');
       tableRef?.current?.reload();
+      countRequest.run()
     } catch (e) {
       console.log(e);
     } finally {
@@ -71,6 +95,7 @@ const OrderList = props => {
       await OrderApi.serviceFinish({ id });
       message.success('操作成功');
       tableRef?.current?.reload();
+      countRequest.run()
     } catch (e) {
       console.log(e);
     } finally {
@@ -84,11 +109,11 @@ const OrderList = props => {
       title: '订单号',
       dataIndex: 'orderNo',
       width: 270,
-      render: (v, { orderType, platform }) => <Space size={'small'} >
+      render: (v, { orderType }) => <Space size={'small'}>
         <span>{v}</span>
 
-          {orderType !== Enums.orderType.NORMAL.value &&
-          <Tag color={Enums.orderType[orderType]?.color}>{Enums.orderType[orderType]?.text}</Tag>}
+        {orderType !== Enums.orderType.NORMAL.value &&
+        <Tag color={Enums.orderType[orderType]?.color}>{Enums.orderType[orderType]?.text}</Tag>}
       </Space>,
       copyable: true,
     },
@@ -96,7 +121,7 @@ const OrderList = props => {
       title: '服务信息',
       dataIndex: 'service',
       width: 300,
-      render: (_, { service,sku,num }) => <ServiceItem service={service} sku={sku} num={num} />,
+      render: (_, { service, sku }) => <ServiceItem service={service} sku={sku}  />,
     },
     {
       title: '地址',
@@ -126,7 +151,7 @@ const OrderList = props => {
       width: 100,
     },
     {
-      title: '实付金额',
+      title: '订单金额',
       dataIndex: 'actualFee',
       valueType: 'money',
       hideInSearch: true,
@@ -159,12 +184,12 @@ const OrderList = props => {
       dataIndex: 'option',
       valueType: 'option',
       align: 'center',
-      render: (_, { id, type,state,groupJoin }) => {
+      render: (_, { id, type, state, groupRecordState }) => {
         const orderState = Enums.orderState[state];
         const orderType = Enums.orderType[type];
         let canConfirm = orderState === Enums.orderState.WAIT_CONFIRM;
         if (orderType === Enums.orderType.GROUP) {
-          if (groupJoin?.groupRecord?.state === Enums.groupRecordState.PROCESSING.value) {
+          if (groupRecordState === Enums.groupRecordState.PROCESSING.value) {
             canConfirm = false;
           }
         }
@@ -202,10 +227,7 @@ const OrderList = props => {
       ]}
         rowKey='id'
         columns={columns}
-        expandable={{
-          // expandedRowRender,
-        }}
-        scroll={{x:1300}}
+        scroll={{ x: 1300 }}
         search={{
           collapseRender: false,
           collapsed: false,

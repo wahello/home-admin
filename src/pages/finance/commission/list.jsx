@@ -7,33 +7,30 @@ import { Avatar, Button, Space } from 'antd';
 const recordColumns = [
   {
     title: '分销用户',
-    dataIndex: 'inviteUser',
+    dataIndex: 'avatar',
     align: 'center',
     formItemProps: {
       name: 'user',
     },
-    render: userInfo => {
+    render: (_, { avatar, nickname, mobile }) => {
       return <Space>
-        <Avatar src={userInfo.avatar} />
+        <Avatar src={avatar} />
         <Space direction={'vertical'}>
-          <b>{userInfo.nickname}</b>
-          <span>{userInfo.mobile}</span>
+          <b>{nickname}</b>
+          <span>{mobile}</span>
         </Space>
       </Space>;
     },
   },
   {
     title: '关联订单',
-    dataIndex: ['order', 'order_no'],
+    dataIndex: 'orderNo',
     width: 200,
     align: 'center',
-    formItemProps:{
-      name:'orderNo'
-    }
   },
   {
     title: '订单金额',
-    dataIndex: 'order_fee',
+    dataIndex: 'orderFee',
     width: 200,
     align: 'center',
     valueType: 'money',
@@ -42,7 +39,7 @@ const recordColumns = [
 
   {
     title: '分销金',
-    dataIndex: 'rebate_fee',
+    dataIndex: 'rebateFee',
     align: 'center',
     valueType: 'money',
     hideInSearch: true,
@@ -55,7 +52,7 @@ const recordColumns = [
   },
   {
     title: '订单创建时间',
-    dataIndex: '_add_time_str',
+    dataIndex: 'createTime',
     align: 'center',
     hideInSearch: true,
   },
@@ -66,8 +63,8 @@ const recordColumns = [
     align: 'center',
     render: (_, record) => {
       return <Space size={'small'}>
-        <Button type={'link'} target={'_blank'}  href={`/member/detail?id=${record.invite_user_id}`}>查看分销用户</Button>
-        <Button type={'link'} target={'_blank'} href={`/order/detail?id=${record.order_id}`}>查看关联订单</Button>
+        <Button type={'link'} target={'_blank'} href={`/member/detail?id=${record.memberId}`}>查看分销用户</Button>
+        <Button type={'link'} target={'_blank'} href={`/order/detail?id=${record.orderId}`}>查看关联订单</Button>
       </Space>;
     },
   },

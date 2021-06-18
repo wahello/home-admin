@@ -1,39 +1,72 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormDateTimePicker, ProFormDependency, ProFormText } from '@ant-design/pro-form';
 import { Form } from 'antd';
 import OrderApi from '@/services/order/order';
+import ChooseLocation from '@/pages/order/components/ChooseLocation';
 
-const EditAddressForm = ({ id, visible, onVisibleChange, onFinish, address }) => {
+const EditAddressForm = ({  visible, onVisibleChange, onFinish, order }) => {
   const [form] = Form.useForm();
-  useEffect(()=>{
-      form.setFieldsValue({...address})
-  },[address])
-  const onSubmit = async values => {
-    await OrderApi.updateAddress({ id, address: values });
+  useEffect(() => {
+    if (order) {
+      form.setFieldsValue({ appointTime: order.appointTime, ...order.address });
+    }
+  }, [order]);
+  const onSubmit = async ({ appointTime,...address }) => {
+    await OrderApi.updateInfo(order.id,{appointTime,address});
     return onFinish();
   };
   return (
-    <ModalForm form={form} width={400} title={'修改地址'} visible={visible} onVisibleChange={onVisibleChange}
-               onFinish={onSubmit} initialValues={address}>
+    <ModalForm layout={'horizontal'} modalProps={{ centered: true }} form={form} width={500} title={'修改订单信息'}
+               visible={visible} labelCol={{ span: 7 }}
+               onVisibleChange={onVisibleChange}
+               onFinish={onSubmit}>
+      <ProFormDateTimePicker
+        width='sm'
+        name='appointTime'
+        label='上门时间'
+        placeholder='请选择上门时间'
+        fieldProps={{ minuteStep: 30, format: 'YYYY-MM-DD HH:mm' }}
+        rules={[{ required: true, message: '不能为空' }]}
+      />
       <ProFormText
-        width='md'
-        name='name'
+        width='sm'
+        name='contract'
         label='联系人'
         placeholder='请输入联系人'
         rules={[{ required: true, message: '不能为空' }]}
       />
       <ProFormText
-        width='md'
+        width='sm'
         name='mobile'
         label='联系方式'
         placeholder='请输入联系方式'
         rules={[{ required: true, message: '不能为空' }]}
       />
+      <ProForm.Item label='地址'>
+        <ProFormText
+          width='sm'
+          name='location'
+          placeholder='请输入地址'
+          readonly
+          rules={[{ required: true, message: '不能为空' }]}
+          noStyle
+        />
+        <ProFormDependency name={['location']}>
+          {({ location }) => {
+            return <ProForm.Item name={'geo'} noStyle>
+              <ChooseLocation location={location} changeLocation={(e) => {
+                form.setFieldsValue({location:e});
+              }
+              } />
+            </ProForm.Item>;
+          }}
+        </ProFormDependency>
+      </ProForm.Item>
       <ProFormText
-        width='md'
-        name='location'
-        label='地址'
+        width='sm'
+        name='detailAddress'
+        label='门牌号'
         placeholder='请输入地址'
         rules={[{ required: true, message: '不能为空' }]}
       />
@@ -43,7 +76,7 @@ const EditAddressForm = ({ id, visible, onVisibleChange, onFinish, address }) =>
 
 EditAddressForm.propTypes = {
   id: PropTypes.string,
-  address: PropTypes.object,
+  order: PropTypes.object,
   visible: PropTypes.bool.isRequired,
   onFinish: PropTypes.func.isRequired,
   onVisibleChange: PropTypes.func.isRequired,

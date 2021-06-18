@@ -122,7 +122,7 @@ const GroupList = () => {
       title: '拼团商品',
       dataIndex: 'service',
       render: (service) => {
-        return <Space><Image src={service.mainPic} width={50} height={50} /><span>{service.name}</span></Space>;
+        return <Space><Image src={service.mainPic} width={50} height={50} preview={{mask:false}} /><span>{service.name}</span></Space>;
       },
       width: 200,
     },

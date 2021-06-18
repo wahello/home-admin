@@ -1,5 +1,6 @@
 import MyIcon from '@/components/MyIcon';
-import { WalletOutlined } from '@ant-design/icons';
+import { MailFilled, WalletOutlined } from '@ant-design/icons';
+import React from 'react';
 
 const Enums = {
   discountType: {
@@ -70,7 +71,7 @@ const Enums = {
       value: 'SERVICING',
     },
     SERVICE_FINISHED: {
-      text: '待确认完成',
+      text: '待客户确认',
       value: 'SERVICE_FINISHED',
     },
     WAIT_PAY_AFTER: {
@@ -131,24 +132,24 @@ const Enums = {
     },
   },
   payChannel: {
-    wxpay: {
+    WXPAY: {
       text: '微信支付',
-      value: 'wxpay',
+      value: 'WXPAY',
       icon: <MyIcon type={'weixin'} size={20} color={'#09BB07'} />,
     },
-    alipay: {
+    ALIPAY: {
       text: '支付宝支付',
-      value: 'alipay',
+      value: 'ALIPAY',
       icon: <MyIcon type={'zhifubao'} size={20} color={'#06B4FD'} />,
     },
-    balance: {
+    BALANCE: {
       text: '余额支付',
-      value: 'balance',
+      value: 'BALANCE',
       icon: <WalletOutlined style={{ fontSize: 20, color: '#ff9900' }} />,
     },
-    offline: {
+    OFFLINE: {
       text: '线下支付',
-      value: 'offline',
+      value: 'OFFLINE',
       icon: <MyIcon type={'offline'} size={20} color={'#9266F9'} />,
     },
   },
@@ -181,7 +182,7 @@ const Enums = {
       color: '#51bc81',
     },
   },
-  refundMethod: {
+  refundChannel: {
     ORIGINAL: {
       text: '原路退回',
       value: 'ORIGINAL',
@@ -218,7 +219,7 @@ const Enums = {
   giftType: {
     NONE: {
       text: '未中奖',
-      value:'NONE',
+      value: 'NONE',
     },
     COUPON: {
       text: '优惠券',
@@ -323,5 +324,39 @@ const Enums = {
       value: 'CANCELED',
     },
   },
+  authState: {
+    NOT_AUTH: {
+      text: '未认证',
+      value: 'NOT_AUTH',
+      status: 'default',
+    },
+    AUTHING: {
+      text: '认证审核中',
+      value: 'AUTHING',
+      status: 'processing',
+    },
+    PASSED: {
+      text: '已通过',
+      value: 'PASSED',
+      status: 'success',
+    },
+    FAILED: {
+      text: '认证失败',
+      value: 'FAILED',
+      status: 'error',
+    },
+  },
+  msgPlatform:{
+    SMS: {
+      text: '短信',
+      value: 'SMS',
+      icon: <MailFilled style={{color:'#0ea5e9',fontSize:20}}  />,
+    },
+    WECHAT: {
+      text: '微信',
+      value: 'WECHAT',
+      icon: <MyIcon type={'weixin'} size={20} color={'#09BB07'} />,
+    },
+  }
 };
 export default Enums;

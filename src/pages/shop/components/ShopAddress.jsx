@@ -17,7 +17,19 @@ const ShopAddress = props => {
   const createdMap = ins => {
     setMap(ins);
     AMap.plugin('AMap.Geocoder', () => {
-      setGeoCoder(new AMap.Geocoder({}));
+      const coder = new AMap.Geocoder({});
+      setGeoCoder(coder);
+      if (postion.area) {
+        coder.setCity({
+          city: postion.area[2],
+        });
+        coder.getLocation(postion.area.join(), (status, result) => {
+          if (status === 'complete' && result.geocodes.length) {
+            const { lng, lat } = result.geocodes[0].location;
+            ins.setZoomAndCenter(11, [lng, lat]);
+          }
+        });
+      }
     });
   };
   const toolEvents = {
@@ -88,9 +100,9 @@ const ShopAddress = props => {
 
 
   return (
-    <Space direction={'vertical'} >
+    <Space direction={'vertical'}>
       <Space size={'small'}>
-        <Cascader value={postion?.area} style={{ width: 300 }} options={areas} onChange={onAreaChange}
+        <Cascader value={postion?.area} style={{ width: 215 }} options={areas} onChange={onAreaChange}
                   allowClear={false} />
         <Input.Search value={postion?.address} onChange={onAddressChange} style={{ width: 500 }} enterButton={'查找地址'}
                       onSearch={searchAddress} placeholder={'详细地址'} />

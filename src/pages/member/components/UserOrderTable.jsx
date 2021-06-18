@@ -33,7 +33,7 @@ const UserOrderTable = ({ memberId }) => {
       title: '服务信息',
       dataIndex: 'service',
       width: 250,
-      render: (_, { service, sku, num }) => <ServiceItem service={service} sku={sku} num={num} />,
+      render: (_, { service, sku }) => <ServiceItem service={service} sku={sku}  />,
     },
     {
       title: '上门地址',

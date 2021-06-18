@@ -50,7 +50,7 @@ const PageList = props => {
     }
   };
 
-  const qrCode = async ({ name,id }) => {
+  const qrCode = async ({ name, id }) => {
     const hide = message.loading('生成二维码中');
     try {
       const res = await PageApi.qrCode(id);
@@ -58,18 +58,18 @@ const PageList = props => {
         title: '微页面二维码',
         icon: false,
         centered: true,
-        content: <Image style={{marginTop:10}} width={200} height={200} preview={false} src={res.data} />,
+        content: <Image style={{ marginTop: 10 }} width={200} height={200} preview={false} src={res.data} />,
         bodyStyle: { textAlign: 'center' },
         okText: '保存本地',
         cancelText: '关闭',
-        onOk:()=>{
-          const a = document.createElement("a");
+        onOk: () => {
+          const a = document.createElement('a');
           a.download = `小程序微页面-${name}.png`;
           a.href = res.data;
-          document.body.append(a)
+          document.body.append(a);
           a.click();
-          a.remove()
-        }
+          a.remove();
+        },
       });
     } catch (e) {
       console.error(e);
@@ -87,12 +87,12 @@ const PageList = props => {
         centered: true,
         cancelText: '关闭',
         okText: '复制链接',
-        content: <Typography.Paragraph style={{marginTop:40}} copyable={false}>{res.data}</Typography.Paragraph>,
+        content: <Typography.Paragraph style={{ marginTop: 40 }} copyable={false}>{res.data}</Typography.Paragraph>,
         bodyStyle: { textAlign: 'center' },
-        onOk:()=>{
-          copy(res.data)
-          message.success('复制成功')
-        }
+        onOk: () => {
+          copy(res.data);
+          message.success('复制成功');
+        },
       });
     } catch (e) {
       console.error(e);
@@ -100,7 +100,6 @@ const PageList = props => {
       hide();
     }
   };
-
 
 
   const recordColumns = [
@@ -128,11 +127,11 @@ const PageList = props => {
       width: 300,
       align: 'center',
       fieldProps: {
-        width:50,
-        height:50,
-        preview:{
-          mask:false
-        }
+        width: 50,
+        height: 50,
+        preview: {
+          mask: false,
+        },
       },
       hideInSearch: true,
     },

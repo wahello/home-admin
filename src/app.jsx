@@ -1,11 +1,12 @@
 import { PageLoading } from '@ant-design/pro-layout';
-import { ConfigProvider, message, notification } from 'antd';
+import { Button, ConfigProvider, message, notification } from 'antd';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
-import LoginApi from '@/services/login';
+import AccountApi from '@/services/account';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import logo from '@/assets/logo-white.svg';
+import Enums from '@/utils/enums';
 
 moment.locale('zh-cn');
 
@@ -22,11 +23,31 @@ export const initialStateConfig = {
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
+
+
+
 export async function getInitialState() {
   const initInfo = async () => {
     try {
-      const userRes = await LoginApi.currentUser();
-      return { userInfo: userRes.data };
+      const { data: userInfo } = await AccountApi.currentUser();
+      if (userInfo&&Enums.authState[userInfo.authState] === Enums.authState.FAILED) {
+        const authKey = `auth${moment().valueOf()}`;
+        const goAuth = () => {
+          message.destroy(authKey);
+          history.push('/shop/setting', {
+            tab: 'auth',
+          });
+        };
+        message.error({
+          key: authKey,
+          duration: 0,
+          content: <span>店铺认证未通过,请检查认证材料重新提交认证 <Button type={'link'} onClick={goAuth}>查看</Button></span>,
+          style: {
+            marginTop: 70,
+          },
+        });
+      }
+      return { userInfo };
     } catch (error) {
       console.error(error);
       history.push(loginPath);
@@ -34,7 +55,7 @@ export async function getInitialState() {
     return undefined;
   };
   // 如果是登录页面，不执行
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== loginPath&&history.location.pathname !== "/user/register") {
     const { navMenu, userInfo } = await initInfo();
     return {
       initInfo,
@@ -60,7 +81,7 @@ export const layout = ({ initialState }) => {
     footerRender: false,
     onPageChange: () => {
       const { location } = history;
-      if (!initialState?.userInfo && location.pathname !== loginPath) {
+      if (!initialState?.userInfo && location.pathname !== loginPath &&location.pathname!=='/user/register') {
         history.push(loginPath);
       }
     },
@@ -120,7 +141,7 @@ const errorHandler = (error) => {
       const errorText = codeMessage[response.status] || response.statusText;
       const { status, url } = response;
       notification.error({
-        message: `请求错误 ${status}: ${url}`,
+        message: `请求错误 ${status}`,
         description: errorText,
       });
     }
@@ -137,12 +158,12 @@ const errorHandler = (error) => {
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request = {
   errorHandler,
-  prefix: isDev?'':'https://api.anjujing.cn',
+  prefix: isDev ? '' : 'https://api.anjujing.cn',
   requestInterceptors: [(url, options) => {
     const authHeader = {};
     const token = localStorage.getItem('token');
     if (token) {
-      authHeader.Authorization = token;
+      authHeader['t-auth'] = token;
     }
     return {
       url,

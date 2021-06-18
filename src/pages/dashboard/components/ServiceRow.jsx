@@ -12,10 +12,10 @@ const visitColumn = [{
   width: 48,
   align: 'center',
 }, {
-  dataIndex: 'name',
+  dataIndex: 'serviceName',
   title: '服务',
 }, {
-  dataIndex: 'visit_count',
+  dataIndex: 'value',
   title: '访问量',
   align: 'center',
 }];
@@ -26,10 +26,10 @@ const orderNumColumn = [{
   width: 48,
   align: 'center',
 }, {
-  dataIndex: ['service','name'],
+  dataIndex: 'serviceName',
   title: '服务',
 }, {
-  dataIndex: 'orderNum',
+  dataIndex: 'value',
   title: '订单量',
   align: 'center',
 }];
@@ -41,10 +41,10 @@ const saleTotalColumn = [{
   width: 48,
   align: 'center',
 }, {
-  dataIndex: ['service','name'],
+  dataIndex: 'serviceName',
   title: '服务',
 }, {
-  dataIndex: 'saleTotal',
+  dataIndex: 'value',
   title: '成交金额',
   valueType: 'money',
   align: 'center',

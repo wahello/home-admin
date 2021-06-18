@@ -68,8 +68,8 @@ const OrderRow = () => {
     return dateList.map(date => {
       return data?.find(it => it.date === date) || {
         date,
-        orderNum: Number((100 * Math.random()).toFixed(0)),
-        saleTotal: Number((10000 * Math.random()).toFixed(0)),
+        orderNum: 0,
+        saleTotal: 0,
       };
     });
   }, [queryRange, data]);

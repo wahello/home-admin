@@ -3,7 +3,10 @@ import { request } from 'umi';
 const CommissionApi = {
 
   page: async (data) => {
-    return request('admin/finance/commission/sys/page',{data});
+    return request('/api/rebate/pageRecord', {
+      method: 'POST',
+      data,
+    });
   },
 };
 export default CommissionApi;

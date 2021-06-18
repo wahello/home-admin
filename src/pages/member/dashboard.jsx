@@ -4,15 +4,13 @@ import MemberApi from '@/services/member';
 import { Spin } from 'antd';
 
 const MemberDashboard = props => {
-  const {data} = useRequest(MemberApi.dashboard)
-  console.log(data);
-  return (
-    <Spin>
+  const { data } = useRequest(MemberApi.dashboard);
 
-    </Spin>
-  );
+  return <div>
+
+  </div>
+    ;
 };
-
 
 
 export default MemberDashboard;

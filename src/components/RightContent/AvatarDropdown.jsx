@@ -84,7 +84,7 @@ const AvatarDropdown = ({ menu }) => {
               <span className={`${styles.action} ${styles.account}`}>
       <Space size={'small'}>
         <span>有效期: {userInfo.expireDate ? moment(userInfo.expireDate).format('YYYY-MM-DD') : '永久'}</span>
-        <span>{userInfo.brand}</span>
+        <span>{userInfo.realName}</span>
       </Space>
                    </span>
     </HeaderDropdown>

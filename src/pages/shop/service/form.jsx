@@ -4,7 +4,7 @@ import ProForm, {
   ProFormDependency,
   ProFormDigit,
   ProFormRadio,
-  ProFormSelect,
+  ProFormSelect, ProFormSwitch,
   ProFormText,
   ProFormTimePicker,
 } from '@ant-design/pro-form';
@@ -253,6 +253,22 @@ const ServiceForm = props => {
                   label={'预定金额'}
                   rules={[{ required: true }]}
                 />}
+              </ProFormDependency>
+              <ProFormSwitch name={'rebateFlag'} label={'是否返佣'} rules={[{ required: true }]} />
+              <ProFormDependency name={['rebateFlag']}>
+                {({ rebateFlag }) => rebateFlag && <ProForm.Item label={'返佣比例'} extra={'返佣金额=实际订单金额*返佣比例'}>
+                  <ProFormDigit
+                    width={'xs'}
+                    initialValue={10}
+                    name={'rebateRate'}
+                    min={1}
+                    max={100}
+                    rules={[{ required: true }]}
+                    noStyle
+                  />
+                  <span> %</span>
+                </ProForm.Item>
+                }
               </ProFormDependency>
               <ProForm.Item name={'mainPic'} label={'主图'} rules={[{ required: true }]}>
                 <MaterialPicker />

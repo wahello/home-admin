@@ -7,10 +7,15 @@ export default [
         path: '/user',
         routes: [
           {
-            name: 'login',
+            name: '登录',
             path: '/user/login',
             component: './user/Login',
           },
+          {
+            name: '注册',
+            path: '/user/register',
+            component: './user/register',
+          }
         ],
       },
     ],
@@ -57,13 +62,14 @@ export default [
     name: '订单管理',
     icon: 'project',
     routes: [
+      { path: '/order', redirect: 'list' },
       {
         path: '/order/list',
         name: '订单列表',
         component: './order/list',
       },
       {
-        path: '/order/evaluate-list',
+        path: '/order/evaluates',
         name: '评价列表',
         component: './order/evaluate-list',
       },
@@ -81,6 +87,16 @@ export default [
     name: '店铺管理',
     icon: 'shop',
     routes: [
+      {
+        path: '/shop/setting',
+        name: '店铺设置',
+        component: './shop/setting',
+      },
+      {
+        path: '/shop/message',
+        name: '消息通知',
+        component: './shop/message',
+      },
       {
         path: '/shop/service-category',
         name: '服务分类',
@@ -149,12 +165,6 @@ export default [
         name: '相册管理',
         icon: 'picture',
         component: './shop/album/index',
-      },
-      {
-        path: '/shop/config',
-        name: '店铺设置',
-        icon: 'setting',
-        component: './shop/config',
       },
     ],
   },

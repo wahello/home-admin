@@ -1,11 +1,11 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { message } from 'antd';
+import { message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { history, Link, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import styles from './index.less';
-import LoginApi from '@/services/login';
+import AccountApi from '@/services/account';
 
 
 const goto = () => {
@@ -14,13 +14,16 @@ const goto = () => {
     const { query } = history.location;
     const { redirect } = query;
     history.push(redirect || '/');
-  }, 10);
+  }, 50);
 };
+
 
 
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const { initialState, setInitialState } = useModel('@@initialState');
+
+  const [type,setType] = useState('password')
 
 
   const fetchInitInfo = async () => {
@@ -35,7 +38,7 @@ const Login = () => {
     setSubmitting(true);
     try {
       // 登录
-      const res = await LoginApi.login({
+      const res = await AccountApi.login({
         ...values,
       });
       message.success('登录成功！');
@@ -73,6 +76,16 @@ const Login = () => {
             }}
             onFinish={handleSubmit}
           >
+            <Tabs activeKey={type} onChange={setType}>
+              <Tabs.TabPane
+                key="password"
+                tab={'密码登录'}
+              />
+              <Tabs.TabPane
+                key="mobile"
+                tab={'验证码登录'}
+              />
+            </Tabs>
             <ProFormText
               name='mobile'
               fieldProps={{

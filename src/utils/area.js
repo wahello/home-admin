@@ -7,7 +7,7 @@ export default [
 
     children: [
       {
-        value: '', label: '北京市',
+        value: '北京市', label: '北京市',
         children: [
 
           { value: '东城区', label: '东城区' },
@@ -60,7 +60,7 @@ export default [
     children: [
 
       {
-        value: '',
+        value: '天津市',
 
         label: '天津市',
 
@@ -2322,7 +2322,7 @@ export default [
     children: [
 
       {
-        value: '',
+        value: '上海市',
 
         label: '上海市',
 
@@ -6802,7 +6802,7 @@ export default [
     children: [
 
       {
-        value: '',
+        value: '重庆市',
 
         label: '重庆市',
 

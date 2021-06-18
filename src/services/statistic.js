@@ -4,11 +4,11 @@ const StatisticApi = {
   todayData: async () => {
     return request('/api/analysis/dashboard');
   },
-  orderData: async (data) => {
-    return request('admin/statistic/sys/orderData', { data });
+  orderData: async (params) => {
+    return request('/api/analysis/orderData', { params });
   },
-  serviceData: async (data) => {
-    return request('admin/statistic/sys/serviceData');
+  serviceData: async () => {
+    return request('/api/analysis/serviceData');
   },
 };
 export default StatisticApi;

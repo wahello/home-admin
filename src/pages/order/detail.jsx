@@ -14,6 +14,10 @@ import uuid from 'uuid';
 import { ModalForm, ProFormDigit, ProFormField } from '@ant-design/pro-form';
 import { useBoolean } from 'ahooks';
 import CancelOrderForm from '@/pages/order/components/CancelOrderForm';
+import { isNil } from 'lodash';
+import { history } from 'umi';
+import EditAddressForm from '@/pages/order/components/EditAddressForm';
+
 
 const payRecordColumns = [{
   dataIndex: 'payNo',
@@ -36,7 +40,7 @@ const payRecordColumns = [{
   valueType: 'dateTime',
   width: 250,
 }, {
-  dataIndex: 'fee',
+  dataIndex: 'payFee',
   title: '支付金额',
   valueType: 'money',
   width: 200,
@@ -67,7 +71,7 @@ const refundRecordColumns = [{
     title: '退款时间',
     width: '20%',
   }, {
-    dataIndex: 'fee',
+    dataIndex: 'refundFee',
     title: '退款金额',
     valueType: 'money',
     width: '10%',
@@ -77,9 +81,9 @@ const refundRecordColumns = [{
     valueEnum: Enums.refundType,
     width: '10%',
   }, {
-    dataIndex: 'method',
+    dataIndex: 'channel',
     title: '退款路径',
-    valueEnum: Enums.refundMethod,
+    valueEnum: Enums.refundChannel,
     width: '10%',
   }, {
     dataIndex: ['handle_user', 'username'],
@@ -98,7 +102,7 @@ const adjustColumns = [{
   title: '收费项目名称',
   align: 'center',
   formItemProps: {
-    rules: [{ required: true, message: '不能为空' }],
+    rules: [{ required: true, message: '项目名称不能为空' }],
   },
 }, {
   dataIndex: 'fee',
@@ -106,7 +110,8 @@ const adjustColumns = [{
   valueType: 'money',
   align: 'center',
   formItemProps: {
-    rules: [{ required: true, message: '不能为空' }],
+    normalize: value => (isNil(value) ? '' : value),
+    rules: [{ required: true, message: '金额不能为空' }],
   },
 }, {
   dataIndex: 'remark',
@@ -116,9 +121,6 @@ const adjustColumns = [{
   title: '操作',
   valueType: 'option',
   align: 'center',
-  render: () => {
-    return null;
-  },
 }];
 
 
@@ -134,13 +136,15 @@ const OrderDetail = props => {
 
   const [payOfflineVisible, togglePayOfflineVisible] = useBoolean(false);
   const [cancelVisible, toggleCancelVisible] = useBoolean(false);
+  const [editVisible, toggleEditVisible] = useBoolean(false);
+  const [adjustLoading, toggleAdJustLoading] = useBoolean(false);
 
   useEffect(() => {
     if (order) {
-      const dbAdjustItems = order.adjustItems || [];
+      const dbAdjustItems = (order.adjustItems || []).map(it => ({ id: uuid(), ...it }));
       setAdjustItems(dbAdjustItems);
       const orderState = Enums.orderState[order.state];
-      if ([Enums.orderState.SERVICING, Enums.orderState.WAIT_PAY_AFTER].includes(orderState)) {
+      if ([Enums.orderState.SERVICING].includes(orderState)) {
         setEditableRowKeys(dbAdjustItems.map(it => it.id));
       }
     }
@@ -197,7 +201,8 @@ const OrderDetail = props => {
 
     }, {
       dataIndex: ['address', 'location'],
-      title: '联系地址',
+      title: '服务地址',
+      render: (_, { address }) => `${address.location} ${address.detailAddress}`,
       formItemProps: {
         rules: [{ required: true, message: '不能为空' }],
       },
@@ -230,7 +235,7 @@ const OrderDetail = props => {
       okText: '确认',
       centered: true,
       onOk: async () => {
-        await OrderApi.confirm({ id });
+        await OrderApi.confirm(id);
         refresh();
         return true;
       },
@@ -242,7 +247,7 @@ const OrderDetail = props => {
       okText: '确认',
       centered: true,
       onOk: async () => {
-        await OrderApi.service({ id });
+        await OrderApi.service(id);
         refresh();
         return true;
       },
@@ -254,7 +259,7 @@ const OrderDetail = props => {
       okText: '确认',
       centered: true,
       onOk: async () => {
-        await OrderApi.serviceFinish({ id });
+        await OrderApi.serviceFinish(id);
         refresh();
       },
     });
@@ -262,26 +267,28 @@ const OrderDetail = props => {
 
   const addAdjustItem = useCallback(() => {
     const newId = uuid();
-    setAdjustItems([...adjustItems, { id: newId }]);
+    setAdjustItems([...adjustItems, {
+      id: newId,
+      name:undefined,
+      fee:1,
+      remark:undefined
+    }]);
     setEditableRowKeys([...editableKeys, newId]);
   }, [adjustItems, editableKeys]);
 
   const saveAdjustItems = useCallback(async () => {
-    await adjustItemForm.validateFields();
-    Modal.confirm({
-      content: '确认添加额外服务项?',
-      okText: '确认',
-      centered: true,
-      onOk: async () => {
-        await OrderApi.saveAdjustItems({ id, adjustItems });
-        refresh();
-        return true;
-      },
-    });
+    try {
+      toggleAdJustLoading.setTrue();
+      await adjustItemForm.validateFields();
+      await OrderApi.saveAdjustItems(id, adjustItems);
+      refresh();
+    } finally {
+      toggleAdJustLoading.setFalse();
+    }
   }, [adjustItemForm, adjustItems, id, refresh]);
 
-  const payOffline = async ({ fee, remark }) => {
-    await OrderApi.payOffline({ id, fee, remark });
+  const payOffline = async ({ payFee, remark }) => {
+    await OrderApi.payOffline(id, { payFee, remark });
     refresh();
     return true;
   };
@@ -295,7 +302,7 @@ const OrderDetail = props => {
   };
 
   const closeOrder = () => {
-    const payType = Enums.payType[order.service.pay.type];
+    const payType = Enums.payType[order.payType];
     if (payType !== Enums.payType.AFTER) {
       toggleCancelVisible.setTrue();
       return;
@@ -308,7 +315,7 @@ const OrderDetail = props => {
       okButtonProps: { danger: true },
       centered: true,
       onOk: async () => {
-        await OrderApi.cancelOrder({ id });
+        await OrderApi.cancelOrder(id);
         refresh();
         return true;
       },
@@ -322,7 +329,7 @@ const OrderDetail = props => {
       let canConfirm = orderState === Enums.orderState.WAIT_CONFIRM;
       let canClose = [Enums.orderState.WAIT_PAY, Enums.orderState.WAIT_PAY_PART, Enums.orderState.WAIT_CONFIRM, Enums.orderState.WAIT_SERVICE, Enums.orderState.SERVICING, Enums.orderState.CLOSING].includes(orderState);
       if (orderType === Enums.orderType.GROUP) {
-        if (order.groupJoin?.groupRecord?.state === Enums.groupRecordState.PROCESSING.value) {
+        if (order.groupRecordState === Enums.groupRecordState.PROCESSING.value) {
           canConfirm = false;
           canClose = false;
         }
@@ -330,12 +337,17 @@ const OrderDetail = props => {
       const canService = orderState === Enums.orderState.WAIT_SERVICE;
       const canServiceEnd = orderState === Enums.orderState.SERVICING;
       const canPayOffline = orderState === Enums.orderState.WAIT_PAY_AFTER;
+      const canEdit = [Enums.orderState.WAIT_PAY, Enums.orderState.WAIT_PAY_PART, Enums.orderState.WAIT_CONFIRM, Enums.orderState.WAIT_SERVICE, Enums.orderState.SERVICING].includes(orderState);
       return <Space>
+        <Button  onClick={confirmService}>添加备注</Button>
+        {canEdit&&<Button  onClick={toggleEditVisible.setTrue}>修改订单信息</Button>}
         {canConfirm && <Button type={'primary'} onClick={confirmService}>确认订单</Button>}
         {canService && <Button type={'primary'} onClick={startService}>开始服务订单</Button>}
         {canServiceEnd && <Button type={'primary'} onClick={serviceFinish}>完成服务</Button>}
         {canPayOffline && <Button type={'primary'} onClick={openPayOffline}>线下支付</Button>}
-        {canClose && <Button type={'primary'} onClick={closeOrder} danger>取消订单</Button>}
+        {canClose && <Button type={'primary'} onClick={closeOrder} danger>{
+          orderState===Enums.orderState.CLOSING?'处理取消申请':'取消订单'
+        }</Button>}
       </Space>;
     }
     return null;
@@ -348,21 +360,23 @@ const OrderDetail = props => {
           type='primary'
           key='save'
           onClick={addAdjustItem}
+          disabled={adjustLoading}
         >添加</Button>
         <Button
           type='primary'
           key='save'
+          loading={adjustLoading}
           onClick={saveAdjustItems}
         >保存</Button>
       </Space>;
     }
     return null;
-  }, [addAdjustItem, order?.state, saveAdjustItems]);
+  }, [adjustLoading, addAdjustItem, order?.state, saveAdjustItems]);
 
   return <PageContainer extra={renderExtra} fixedHeader>
     {
       error ? <ProCard>
-        <Result status={404} title={'订单不存在'} extra={<Button onClick={window.close}>关闭</Button>} />
+        <Result status={404} title={'订单不存在'} extra={<Button onClick={()=>history.goBack()}>返回</Button>} />
       </ProCard> : loading ? <>
           <ProCard><Skeleton /></ProCard><br /><ProCard><Skeleton /></ProCard><br /><ProCard><Skeleton /></ProCard></> :
         <>
@@ -372,8 +386,8 @@ const OrderDetail = props => {
             extra={
               <span style={{ fontSize: 20, fontWeight: 'bold' }}>
               {Enums.orderState[order.state].text}
-                {order.groupJoin?.groupRecord?.state && <span
-                  style={{ color: Enums.groupRecordState[order.groupJoin.groupRecord.state].color }}>({Enums.groupRecordState[order.groupJoin.groupRecord.state].text})</span>}
+                {order.groupRecordState && <span
+                  style={{ color: Enums.groupRecordState[order.groupRecordState].color }}>({Enums.groupRecordState[order.groupRecordState].text})</span>}
             </span>
             }>
             <Row>
@@ -382,9 +396,7 @@ const OrderDetail = props => {
                   actionRef={actionRef}
                   dataSource={order}
                   columns={infoColumns}
-                  editable={{
-                    onSave: onUpdateOrder,
-                  }}
+                  editable={false}
                 />
               </Col>
               <Col span={3} offset={3}>
@@ -401,10 +413,10 @@ const OrderDetail = props => {
 
           <br />
           <ProCard title={'支付记录'} subTitle={'(由于支付平台到账通知有延时,用户支付成功的订单状态更新可能会出现稍许延迟)'}>
-            <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'_id'} toolbar={false}
+            <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'id'} toolbar={false}
                       scroll={{ y: 300 }}
                       options={false} pagination={false}
-                      dataSource={order?.pay_records}
+                      dataSource={order?.payRecords}
                       columns={payRecordColumns} />
           </ProCard>
           <br />
@@ -420,7 +432,7 @@ const OrderDetail = props => {
                 type: 'multiple',
                 editableKeys,
                 actionRender: (row, config, defaultDom) => {
-                  return [defaultDom.delete];
+                  return !adjustLoading&&[defaultDom.delete];
                 },
                 onValuesChange: (record, recordList) => {
                   setAdjustItems(recordList);
@@ -431,21 +443,21 @@ const OrderDetail = props => {
           </ProCard>
           <br />
 
-          <ProCard title={'退款记录'} >
-            <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'_id'} toolbar={false}
+          <ProCard title={'退款记录'}>
+            <ProTable cardProps={{ bodyStyle: { padding: 0 } }} search={false} rowKey={'id'} toolbar={false}
                       options={false} pagination={false}
-                      dataSource={order?.refund_records}
+                      dataSource={order?.refundRecords}
                       columns={refundRecordColumns} />
           </ProCard>
-          <ModalForm width={400} title={'线下支付'} layout={'horizontal'} labelCol={{ span: 6 }}
+          <ModalForm width={400} title={'线下付款'} layout={'horizontal'} labelCol={{ span: 6 }}
                      modalProps={{ centered: true }}
                      visible={payOfflineVisible}
                      onVisibleChange={togglePayOfflineVisible.toggle} onFinish={payOffline}
-                     initialValues={{ fee: Number(order.actual_fee - order.paid_fee).toFixed(2) }}>
+                     initialValues={{ payFee: Number(order.actualFee - order.paidFee).toFixed(2) }}>
             <ProFormDigit
               width='200'
-              max={order.actual_fee - order.paid_fee}
-              name='fee'
+              max={order.actualFee - order.paidFee}
+              name='payFee'
               label='付款金额'
               placeholder='请输入'
               rules={[{ required: true, message: '不能为空' }]}
@@ -462,6 +474,10 @@ const OrderDetail = props => {
             return true;
           }
           } onVisibleChange={toggleCancelVisible.toggle} order={order} />
+          <EditAddressForm order={order} onFinish={() => {
+            refresh();
+            return true;
+          }} onVisibleChange={toggleEditVisible.toggle} visible={editVisible}/>
         </>
     }
   </PageContainer>;
